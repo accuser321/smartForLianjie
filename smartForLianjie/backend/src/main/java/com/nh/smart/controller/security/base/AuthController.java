@@ -56,6 +56,12 @@ public class AuthController {
         return authService.changePhone(phone);
     }
 
+    // 兼容 query 形式：/saas/auth/changePhone?phone=xxx
+    @GetMapping("/changePhone")
+    public Result getPhnoeNumByQuery(@RequestParam String phone) throws Exception {
+        return getPhnoeNum(phone);
+    }
+
 
     /**
      * 南华网销注册发送验证码
@@ -70,6 +76,12 @@ public class AuthController {
     })
     public Result register(@PathVariable String phone) throws Exception {
         return authService.register(phone);
+    }
+
+    // 兼容 query 形式：/saas/auth/register?phone=xxx
+    @GetMapping("/register")
+    public Result registerByQuery(@RequestParam String phone) throws Exception {
+        return register(phone);
     }
 
 
@@ -113,6 +125,12 @@ public class AuthController {
     })
     public Result msglogin(@PathVariable String phone) throws Exception {
         return authService.msglogin(phone);
+    }
+
+    // 兼容 query 形式：/saas/auth/msglogin?phone=xxx
+    @GetMapping("/msglogin")
+    public Result msgloginByQuery(@RequestParam String phone) throws Exception {
+        return msglogin(phone);
     }
 
 

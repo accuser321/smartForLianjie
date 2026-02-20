@@ -291,4 +291,14 @@ public class V2CompatActionController {
             return Result.successJson(json);
         }
     }
+
+    @GetMapping("/getNowDayCount")
+    public Result getNowDayCount() {
+        JSONObject json = new JSONObject();
+        json.put("readnum", 0);
+        json.put("sharenum", 0);
+        json.put("looknum", 0);
+        json.put("zxnum", 0);
+        return Result.successJson(json);
+    }
 }
