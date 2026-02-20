@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.nh.smart.annotation.MultiRequestBody;
+import com.nh.smart.dao.record.SmartComKjActionRecordDao;
 import com.nh.smart.dao.record.SmartComWxmsgDao;
 import com.nh.smart.dao.record.SmartKjCustomEmpshipDao;
 import com.nh.smart.entity.base.Result;
@@ -22,6 +23,8 @@ public class V2CompatActionController {
     private SmartComWxmsgDao smartComWxmsgDao;
     @Autowired
     private SmartKjCustomEmpshipDao smartKjCustomEmpshipDao;
+    @Autowired
+    private SmartComKjActionRecordDao smartComKjActionRecordDao;
 
     private String safeComid() {
         try {
@@ -146,27 +149,89 @@ public class V2CompatActionController {
 
     @PostMapping("/getFollowList")
     public Result getFollowList(@RequestBody Map<String, Object> map) {
-        return Result.successJson(emptyPageRowsMap());
+        try {
+            String comid = safeComid();
+            Integer fuserid = safeUserid();
+            Integer tuserid = Integer.valueOf(String.valueOf(map.getOrDefault("userid", "0")));
+            long page = Long.parseLong(String.valueOf(map.getOrDefault("page", "1")));
+            long size = Long.parseLong(String.valueOf(map.getOrDefault("size", "10")));
+            IPage<Map<String, Object>> data = smartComWxmsgDao.selectFollowList(new Page<>(page, size), comid, fuserid, tuserid);
+            Map<String, List<Map<String, Object>>> rows = new LinkedHashMap<>();
+            for (Map<String, Object> item : data.getRecords()) {
+                String day = String.valueOf(item.getOrDefault("day", ""));
+                rows.computeIfAbsent(day, k -> new ArrayList<>()).add(item);
+            }
+            JSONObject json = new JSONObject();
+            json.put("rows", rows);
+            json.put("total", data.getTotal());
+            json.put("totalpage", data.getPages());
+            return Result.successJson(json);
+        } catch (Exception e) {
+            return Result.successJson(emptyPageRowsMap());
+        }
     }
 
     @PostMapping("/insertFollow")
     public Result insertFollow(@MultiRequestBody String userid, @MultiRequestBody String content) {
-        return Result.successJson();
+        try {
+            if (userid == null || userid.trim().isEmpty() || content == null || content.trim().isEmpty()) {
+                return Result.errorJson("参数不能为空");
+            }
+            SmartComWxmsg entity = new SmartComWxmsg();
+            entity.setComid(safeComid());
+            entity.setFuserid(safeUserid());
+            entity.setTuserid(Integer.valueOf(userid));
+            entity.setMsgtype("FOLLOW");
+            entity.setMcontent(content.trim());
+            entity.setPushtime(new Date());
+            entity.setStatus("1");
+            smartComWxmsgDao.insert(entity);
+            return Result.successJson();
+        } catch (Exception e) {
+            return Result.errorJson("添加失败");
+        }
     }
 
     @DeleteMapping("/deleteFollow")
     public Result deleteFollow(@RequestParam(required = false) String id) {
-        return Result.successJson();
+        try {
+            if (id == null || id.trim().isEmpty()) {
+                return Result.errorJson("id不能为空");
+            }
+            smartComWxmsgDao.deleteFollowById(safeComid(), Integer.valueOf(id), safeUserid());
+            return Result.successJson();
+        } catch (Exception e) {
+            return Result.errorJson("删除失败");
+        }
     }
 
     @DeleteMapping("/deleteFollow/{id}")
     public Result deleteFollowByPath(@PathVariable String id) {
-        return Result.successJson();
+        return deleteFollow(id);
     }
 
     @PostMapping("/getInteractiveList")
     public Result getInteractiveList(@RequestBody Map<String, Object> map) {
-        return Result.successJson(emptyPageRowsMap());
+        try {
+            String comid = safeComid();
+            String empno = safeEmpno();
+            Integer userid = Integer.valueOf(String.valueOf(map.getOrDefault("userid", "0")));
+            long page = Long.parseLong(String.valueOf(map.getOrDefault("page", "1")));
+            long size = Long.parseLong(String.valueOf(map.getOrDefault("size", "10")));
+            IPage<Map<String, Object>> data = smartComKjActionRecordDao.selectInteractiveList(new Page<>(page, size), comid, empno, userid);
+            Map<String, List<Map<String, Object>>> rows = new LinkedHashMap<>();
+            for (Map<String, Object> item : data.getRecords()) {
+                String day = String.valueOf(item.getOrDefault("day", ""));
+                rows.computeIfAbsent(day, k -> new ArrayList<>()).add(item);
+            }
+            JSONObject json = new JSONObject();
+            json.put("rows", rows);
+            json.put("total", data.getTotal());
+            json.put("totalpage", data.getPages());
+            return Result.successJson(json);
+        } catch (Exception e) {
+            return Result.successJson(emptyPageRowsMap());
+        }
     }
 
     @GetMapping("/getAIAnalysis/{userid}")

@@ -125,4 +125,25 @@
     <select id="selectCountWDMessage" resultType="java.lang.Integer">
         select count(*) from smart_com_wxmsg where tuserid = #{userid} and comid = #{comid} and status = '0'
     </select>
+
+    <select id="selectFollowList" resultType="java.util.Map">
+        SELECT
+            msgid AS id,
+            mcontent AS content,
+            DATE_FORMAT(pushtime, '%Y-%m-%d') AS day
+        FROM smart_com_wxmsg
+        WHERE comid = #{comid}
+          AND fuserid = #{fuserid}
+          AND tuserid = #{tuserid}
+          AND msgtype = 'FOLLOW'
+        ORDER BY pushtime DESC
+    </select>
+
+    <delete id="deleteFollowById">
+        DELETE FROM smart_com_wxmsg
+        WHERE comid = #{comid}
+          AND msgid = #{msgid}
+          AND msgtype = 'FOLLOW'
+          AND fuserid = #{fuserid}
+    </delete>
 </mapper>

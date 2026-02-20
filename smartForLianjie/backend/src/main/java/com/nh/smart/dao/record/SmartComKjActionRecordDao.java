@@ -135,4 +135,9 @@ public interface SmartComKjActionRecordDao extends BaseMapper<SmartComKjActionRe
      * @Date: 2020/1/19
      */
     Integer updateDZ(@Param("comid") String comid, @Param("empno") String empno, @Param("userid") Integer userid, @Param("flag") String flag);
+
+    /**
+     * 客户互动记录列表
+     */
+    IPage<Map<String, Object>> selectInteractiveList(Page pageModel, @Param("comid") String comid, @Param("empno") String empno, @Param("userid") Integer userid);
 }

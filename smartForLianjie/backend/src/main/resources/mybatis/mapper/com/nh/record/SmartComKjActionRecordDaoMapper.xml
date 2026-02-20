@@ -224,4 +224,28 @@
       </if>
       where comid = #{comid} and empno = #{empno} and userid = #{userid}
     </update>
+
+    <select id="selectInteractiveList" resultType="java.util.Map">
+        SELECT
+            DATE_FORMAT(record.begtime, '%Y-%m-%d') AS day,
+            record.begtime,
+            IFNULL(record.btagcode, '') AS btagcode,
+            IFNULL(record.remark, '') AS remark,
+            IFNULL(lib.stitle, '') AS stitle,
+            IFNULL(mu.headimg, '') AS headimg,
+            IFNULL(NULLIF(base.name, ''), IFNULL(mu.nickname, '')) AS khname,
+            CONCAT(IFNULL(record.acttimes, 0), '秒') AS acttime,
+            CONCAT(IFNULL(record.acttimes, 0), '秒') AS basttime
+        FROM smart_com_kj_action_record record
+        LEFT JOIN smart_com_kj_custom_basemsg base
+            ON base.comid = record.comid AND base.empno = record.empno AND base.userid = record.userid
+        LEFT JOIN smart_com_muser mu
+            ON mu.comid = record.comid AND mu.userid = record.userid AND mu.status = '0'
+        LEFT JOIN smart_com_kj_libw_empno lib
+            ON lib.comid = record.comid AND lib.sno = record.sno
+        WHERE record.comid = #{comid}
+          AND record.empno = #{empno}
+          AND record.userid = #{userid}
+        ORDER BY record.begtime DESC
+    </select>
 </mapper>

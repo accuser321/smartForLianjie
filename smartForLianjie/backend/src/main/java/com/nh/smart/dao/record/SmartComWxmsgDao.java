@@ -131,4 +131,14 @@ public interface SmartComWxmsgDao extends BaseMapper<SmartComWxmsg> {
      * @date 2020/1/11
      */
     Integer selectCountWDMessage(@Param("comid") String comid, @Param("userid") Integer userid);
+
+    /**
+     * 跟进记录列表
+     */
+    IPage<Map<String, Object>> selectFollowList(Page pageEntity, @Param("comid") String comid, @Param("fuserid") Integer fuserid, @Param("tuserid") Integer tuserid);
+
+    /**
+     * 删除跟进记录
+     */
+    Integer deleteFollowById(@Param("comid") String comid, @Param("msgid") Integer msgid, @Param("fuserid") Integer fuserid);
 }
