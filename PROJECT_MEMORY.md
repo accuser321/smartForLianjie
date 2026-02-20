@@ -62,3 +62,11 @@
   - `V2CompatCouponController`：`grantCoupon` 改为返回数组；
   - `V2CompatUserCardController`：`getTXRecord/getTXRecords` 已补齐提现页面依赖字段（含 `blankmessage`）。
 - 当前策略保持不变：先保证“页面不报错 + 可联调”，再逐条替换为真实业务查询。
+
+## 11. 最新进展（2026-02-20 深夜）
+- 已继续补齐首页/个人中心/消息推送链路的接口结构，减少前端 `undefined` 风险：
+  - `V2CompatHxController`：`selectGZByEmpno/selectGRZXByEmpno`
+  - `V2CompatUserCardController`：`selectKHbyEmpno`
+  - `V2CompatActivityController`：`selectActivity/getActivity`
+  - `V2CompatYqhSignupController`：`selectPush/selectKFMsgList`
+- 结果：工资明细、热门活动详情、消息推送页、保单预警页在“无真实库”模式下结构可联调。

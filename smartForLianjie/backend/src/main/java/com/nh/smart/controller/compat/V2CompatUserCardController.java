@@ -12,6 +12,8 @@ public class V2CompatUserCardController {
     @GetMapping("/selectKHbyEmpno")
     public Result selectKHbyEmpno(@RequestParam Map<String, String> params) {
         Map<String, Object> data = new LinkedHashMap<>();
+        data.put("js", sampleKhyjRows("晋升"));
+        data.put("wc", sampleKhyjRows("维持"));
         data.put("rows", new ArrayList<>());
         data.put("total", 0);
         data.put("totalpage", 0);
@@ -118,6 +120,21 @@ public class V2CompatUserCardController {
                 "txno", "TX20260220" + String.format(java.util.Locale.ROOT, "%03d", i + 1),
                 "qrstatus", (i % 4 == 0 ? "2" : (i % 3 == 0 ? "1" : "0")),
                 "remark", (i % 4 == 0 ? "银行卡信息不完整" : "")
+            ));
+        }
+        return rows;
+    }
+
+    private List<Map<String, Object>> sampleKhyjRows(String salenamePrefix) {
+        List<Map<String, Object>> rows = new ArrayList<>();
+        for (int i = 0; i < 2; i++) {
+            List<Map<String, Object>> zb = new ArrayList<>();
+            zb.add(rowKV("name", "月度保费", "value", "0.00/5000"));
+            zb.add(rowKV("name", "活动客户数", "value", "0/10"));
+            rows.add(rowKV(
+                "salename", salenamePrefix + "指标" + (i + 1),
+                "value", "0",
+                "zb", zb
             ));
         }
         return rows;
