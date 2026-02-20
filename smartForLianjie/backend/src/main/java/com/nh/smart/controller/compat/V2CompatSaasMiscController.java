@@ -17,7 +17,21 @@ public class V2CompatSaasMiscController {
 
     @PostMapping("/saas/dr/access")
     public Result access(@RequestBody Map<String, Object> data) {
-        return Result.successJson(new LinkedHashMap<String, Object>());
+        Map<String, Object> user = new LinkedHashMap<>();
+        user.put("userid", 10001);
+        user.put("comid", "COMPAT");
+        user.put("empno", "E10001");
+        user.put("empname", "演示用户");
+        user.put("rytype", "W");
+        user.put("headimg", "");
+        user.put("jglower", "JG001");
+        user.put("tjcode", "TJ001");
+        Map<String, Object> wrap = new LinkedHashMap<>();
+        wrap.put("user", user);
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("function", "home");
+        result.put("data", wrap);
+        return Result.successJson(result);
     }
 
     @PostMapping("/saas/ocr/bankCardOcr")
@@ -28,4 +42,3 @@ public class V2CompatSaasMiscController {
         return Result.successJson(data);
     }
 }
-

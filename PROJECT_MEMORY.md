@@ -70,3 +70,7 @@
   - `V2CompatActivityController`：`selectActivity/getActivity`
   - `V2CompatYqhSignupController`：`selectPush/selectKFMsgList`
 - 结果：工资明细、热门活动详情、消息推送页、保单预警页在“无真实库”模式下结构可联调。
+
+## 12. 最新进展（2026-02-20 深夜 2）
+- 已补齐 App 入口兼容返回：
+  - `POST /saas/dr/access` 现在返回 `function` 与 `data.user`，适配 `appoauth` 页面本地存储逻辑。
