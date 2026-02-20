@@ -249,6 +249,10 @@ public class AuthController {
     })
     public void getToken(HttpServletRequest request, @RequestBody Map<String, String> map, HttpServletResponse response) throws Exception {
 
+        if (map == null) {
+            map = new LinkedHashMap<>();
+        }
+
         if (!map.containsKey("fromempno")) {
             map.put("fromempno", "");
         }
@@ -268,12 +272,14 @@ public class AuthController {
         if (StringUtils.isBlank(map.get("code"))) {
             jsonObject.put("code", 500);
             jsonObject.put("msg", "获取openid失败，请求code为空");
+            jsonObject.put("hint", "请检查公众号回调是否携带code参数");
         } else {
             Result result = authService.getToken(map, comid, IpUtil.getIpAddr(request));
             if (!result.getFlag()) {
                 jsonObject.put("code", 500);
                 jsonObject.put("data", result.getData());
                 jsonObject.put("msg", "获取openid失败");
+                jsonObject.put("hint", "请检查appid/secret、回调域名、数据库微信配置");
 
             } else {
                 jsonObject.put("code", 200);
@@ -329,15 +335,31 @@ public class AuthController {
         try {
             out = response.getWriter();
             try {
-                out.append(authService.getWxInfo(comid).toJSONString());
+                JSONObject wxInfo = authService.getWxInfo(comid);
+                if (!wxInfo.containsKey("appid") || StringUtils.isBlank(wxInfo.getString("appid"))) {
+                    wxInfo.put("appid", envOrDefault("WX_APPID", ""));
+                }
+                if (!wxInfo.containsKey("scope") || StringUtils.isBlank(wxInfo.getString("scope"))) {
+                    wxInfo.put("scope", "snsapi_userinfo");
+                }
+                if (!wxInfo.containsKey("ossurl")) {
+                    wxInfo.put("ossurl", envOrDefault("OSS_URL", ""));
+                }
+                if (StringUtils.isBlank(wxInfo.getString("appid"))) {
+                    wxInfo.put("msg", "微信配置缺失：appid为空，请先配置数据库smart_com_setting");
+                }
+                out.append(wxInfo.toJSONString());
             } catch (Exception ex) {
                 JSONObject fallback = new JSONObject();
-                fallback.put("appid", "");
+                fallback.put("appid", envOrDefault("WX_APPID", ""));
                 fallback.put("scope", "snsapi_userinfo");
-                fallback.put("ossurl", "");
-                fallback.put("msossurl", "");
-                fallback.put("comname", "演示机构");
+                fallback.put("ossurl", envOrDefault("OSS_URL", ""));
+                fallback.put("msossurl", envOrDefault("MS_OSS_URL", ""));
+                fallback.put("comname", envOrDefault("COM_NAME", "演示机构"));
                 fallback.put("stylenum", "1");
+                if (StringUtils.isBlank(fallback.getString("appid"))) {
+                    fallback.put("msg", "微信配置缺失：appid为空，请先配置数据库smart_com_setting");
+                }
                 out.append(fallback.toJSONString());
             }
         } catch (IOException e) {
@@ -470,13 +492,13 @@ public class AuthController {
                 result.put("bar", new ArrayList<>());
             }
             if (!result.containsKey("ossurl")) {
-                result.put("ossurl", "");
+                result.put("ossurl", envOrDefault("OSS_URL", ""));
             }
             if (!result.containsKey("msossurl")) {
-                result.put("msossurl", "");
+                result.put("msossurl", envOrDefault("MS_OSS_URL", ""));
             }
             if (!result.containsKey("comname")) {
-                result.put("comname", "演示机构");
+                result.put("comname", envOrDefault("COM_NAME", "演示机构"));
             }
             return Result.successJson(result, "获取openid成功");
         } catch (Exception e) {
@@ -495,9 +517,9 @@ public class AuthController {
                 put("iconhttp", "");
             }});
             result.put("menulist", menulist);
-            result.put("ossurl", "");
-            result.put("msossurl", "");
-            result.put("comname", "演示机构");
+            result.put("ossurl", envOrDefault("OSS_URL", ""));
+            result.put("msossurl", envOrDefault("MS_OSS_URL", ""));
+            result.put("comname", envOrDefault("COM_NAME", "演示机构"));
             ArrayList<Map<String, Object>> banner = new ArrayList<>();
             banner.add(new LinkedHashMap<String, Object>() {{
                 put("pichttp", "");
@@ -527,5 +549,10 @@ public class AuthController {
             result.put("smartComModelsMobileImgs", imgs);
             return Result.successJson(result, "兼容返回");
         }
+    }
+
+    private String envOrDefault(String key, String defaultValue) {
+        String v = System.getenv(key);
+        return StringUtils.isBlank(v) ? defaultValue : v;
     }
 }

@@ -48,10 +48,13 @@ npm run dev
 ## 5. 最小自测（上线前）
 按文档执行：
 - `/Users/demo/Documents/New project/上线最小闭环自测清单.md`
+- 自动化执行：
+```bash
+bash '/Users/demo/Documents/New project/smoke_api.sh'
+```
 
 ## 6. 常见问题
 1. 前端白屏：先看 `/auth/getUerInfo` 是否返回 `menulist/banner/bar`
 2. 素材页空白：检查 `/smartComKjLibw/selectPage`
 3. 咨询历史无数据：检查 `insertKjChat` 后再调用 `getLS`
 4. 角标不变：先调 `selectPush` 再看 `selectWDKFMsg`
-
