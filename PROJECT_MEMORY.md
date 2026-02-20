@@ -108,3 +108,9 @@
   - 素材库链路兜底：`selectPage/selectOneBySno/importWZ/insertWZ/updateWZ/updateBq` 等接口在服务不可用时不阻断流程；
   - 行为与消息页兜底：`getWZRdZf/selectMessage/QueryMessage` 返回可渲染分页结构。
 - 用户强调执行策略：以“功能先完成、尽快上线”为主，优化后置讨论。
+
+## 18. 最新进展（2026-02-21 凌晨 5）
+- 按用户确认继续完成 1/2/3（其中 3 为重点）：
+  - 咨询素材消息：补齐 `wztitle/wzpichttp` 字段；
+  - 首页入口结构：`getUerInfo` 成功/异常路径均补齐 `menulist/banner/bar`；
+  - 新增上线执行文档：`上线最小闭环自测清单.md`（公众号登录到核心页面全链路检查）。

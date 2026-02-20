@@ -323,6 +323,11 @@ public class SmartComKjActionRecordController {
     item.put("msgContent", content);
     item.put("msgType", 1);
     item.put("msgSender", "1".equals(type) ? empno : khuserid);
+    String[] arr = content == null ? new String[0] : content.split("&#&");
+    if (arr.length >= 3 && "".equals(arr[0])) {
+      item.put("wztitle", "演示文章" + arr[2]);
+      item.put("wzpichttp", "");
+    }
     list.add(item);
   }
 

@@ -460,16 +460,71 @@ public class AuthController {
             JSONObject result = authService.getUerInfo();
             Map pictureList = smartComKjLibwService.pictureList();
             result.put("smartComModelsMobileImgs", pictureList);
+            if (!result.containsKey("menulist")) {
+                result.put("menulist", new ArrayList<>());
+            }
+            if (!result.containsKey("banner")) {
+                result.put("banner", new ArrayList<>());
+            }
+            if (!result.containsKey("bar")) {
+                result.put("bar", new ArrayList<>());
+            }
+            if (!result.containsKey("ossurl")) {
+                result.put("ossurl", "");
+            }
+            if (!result.containsKey("msossurl")) {
+                result.put("msossurl", "");
+            }
+            if (!result.containsKey("comname")) {
+                result.put("comname", "演示机构");
+            }
             return Result.successJson(result, "获取openid成功");
         } catch (Exception e) {
             JSONObject result = new JSONObject();
-            result.put("menulist", new ArrayList<>());
+            ArrayList<Map<String, Object>> menulist = new ArrayList<>();
+            menulist.add(new LinkedHashMap<String, Object>() {{
+                put("code", "CS006");
+                put("name", "客户挖掘");
+                put("mklj", "/clientsort");
+                put("iconhttp", "");
+            }});
+            menulist.add(new LinkedHashMap<String, Object>() {{
+                put("code", "CS009");
+                put("name", "热门活动");
+                put("mklj", "/morermhd");
+                put("iconhttp", "");
+            }});
+            result.put("menulist", menulist);
             result.put("ossurl", "");
             result.put("msossurl", "");
             result.put("comname", "演示机构");
-            result.put("banner", new ArrayList<>());
-            result.put("bar", new ArrayList<>());
-            result.put("smartComModelsMobileImgs", new LinkedHashMap<String, Object>());
+            ArrayList<Map<String, Object>> banner = new ArrayList<>();
+            banner.add(new LinkedHashMap<String, Object>() {{
+                put("pichttp", "");
+                put("urltype", "inner");
+                put("urlhttp", "");
+                put("title", "演示Banner");
+            }});
+            result.put("banner", banner);
+            ArrayList<Map<String, Object>> bar = new ArrayList<>();
+            bar.add(new LinkedHashMap<String, Object>() {{
+                put("bancode", "CS006");
+                put("banname", "客户挖掘");
+                put("pichttp", "");
+                put("mklj", "/clientsort");
+            }});
+            bar.add(new LinkedHashMap<String, Object>() {{
+                put("bancode", "CS009");
+                put("banname", "热门活动");
+                put("pichttp", "");
+                put("mklj", "/morermhd");
+            }});
+            result.put("bar", bar);
+            LinkedHashMap<String, Object> imgs = new LinkedHashMap<>();
+            imgs.put("search", "");
+            imgs.put("xxicon", "");
+            imgs.put("zxicon", "");
+            result.put("smartComModelsMobileImgs", imgs);
             return Result.successJson(result, "兼容返回");
         }
     }
