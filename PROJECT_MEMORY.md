@@ -74,3 +74,8 @@
 ## 12. 最新进展（2026-02-20 深夜 2）
 - 已补齐 App 入口兼容返回：
   - `POST /saas/dr/access` 现在返回 `function` 与 `data.user`，适配 `appoauth` 页面本地存储逻辑。
+
+## 13. 最新进展（2026-02-20 深夜 3）
+- 已补齐首页统计与积分链路：
+  - `getNowDayCount` 追加首页所需字段（`JRZF/JRFC/JRHK/JYZF/JYFC/JYHK/wdMsgCount`）；
+  - 新增 `saas/abtComEmpnoJifen` 兼容控制器（`jfList/getJF/jfSum`）。

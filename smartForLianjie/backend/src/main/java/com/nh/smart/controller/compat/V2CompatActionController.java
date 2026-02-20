@@ -464,6 +464,14 @@ public class V2CompatActionController {
     @GetMapping("/getNowDayCount")
     public Result getNowDayCount() {
         JSONObject json = new JSONObject();
+        json.put("JRZF", 0);
+        json.put("JRFC", 0);
+        json.put("JRHK", 0);
+        json.put("JYZF", 0);
+        json.put("JYFC", 0);
+        json.put("JYHK", 0);
+        json.put("wdMsgCount", 0);
+        // 保留旧字段兼容其他页面
         json.put("readnum", 0);
         json.put("sharenum", 0);
         json.put("looknum", 0);
