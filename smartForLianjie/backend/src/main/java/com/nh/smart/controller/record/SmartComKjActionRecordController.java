@@ -96,6 +96,12 @@ public class SmartComKjActionRecordController {
     return Result.successJson(relationTree);
   }
 
+  // 兼容旧前端 query 形式：/getKHRelation?userid=xxx&sno=yyy
+  @GetMapping("/getKHRelation")
+  public Result getKHRelationCompat(@RequestParam String userid, @RequestParam(required = false, defaultValue = "") String sno) throws Exception {
+    return getKHRelation(userid, sno);
+  }
+
 
   /**
    * 文章-谁看了我-谁转发了我
