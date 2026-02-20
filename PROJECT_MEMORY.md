@@ -88,3 +88,10 @@
 - 用户明确暂停功能（记录为白名单外）：
   - 提现与银行卡：`upMount/upYHKMessage/selectYHByEmpno`
   - 优惠券链路：`selectempCouponList/useFWCoupon/grantCoupon`
+
+## 15. 最新进展（2026-02-21 凌晨 2）
+- 按用户确认“1,2,3都要”继续补齐：
+  - `selectPush`：按 `pushid` 返回不同推送详情；
+  - `getActivity`：按 `activityno` 返回不同活动详情；
+  - `getKHContacts`：补充客户关系图结构数据（`message/relationship`）；
+  - `selectKFMsgList`：补充 `userid` 字段并扩展示例消息。

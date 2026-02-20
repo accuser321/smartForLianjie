@@ -144,9 +144,24 @@ public class V2CompatActionController {
 
     @PostMapping("/getKHContacts")
     public Result getKHContacts(@RequestBody Map<String, Object> map) {
+        String useridText = String.valueOf(map.getOrDefault("userid", "10001"));
+        long uid;
+        try {
+            uid = Long.parseLong(useridText);
+        } catch (Exception e) {
+            uid = 10001L;
+        }
+        List<Map<String, Object>> message = new ArrayList<>();
+        message.add(rowKV("userid", uid, "khname", "目标客户", "name", "目标客户", "headimg", ""));
+        message.add(rowKV("userid", uid + 1, "khname", "关联客户A", "name", "关联客户A", "headimg", ""));
+        message.add(rowKV("userid", uid + 2, "khname", "关联客户B", "name", "关联客户B", "headimg", ""));
+        List<Map<String, Object>> relationship = new ArrayList<>();
+        relationship.add(rowKV("source", uid, "target", uid + 1));
+        relationship.add(rowKV("source", uid, "target", uid + 2));
+        relationship.add(rowKV("source", uid + 1, "target", uid + 2));
         JSONObject json = new JSONObject();
-        json.put("relationship", new ArrayList<>());
-        json.put("message", new ArrayList<>());
+        json.put("relationship", relationship);
+        json.put("message", message);
         return Result.successJson(json);
     }
 
