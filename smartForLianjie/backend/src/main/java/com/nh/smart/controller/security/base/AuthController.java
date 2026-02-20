@@ -389,6 +389,14 @@ public class AuthController {
         }
     }
 
+    /**
+     * 兼容前端通过 query 参数传 userid 的调用方式
+     */
+    @GetMapping("/getinfobyid")
+    public Result getinfobyidByParam(@RequestParam String userid) {
+        return getinfobyid(userid);
+    }
+
 
     /**
      * 测试，获取微信accessToken

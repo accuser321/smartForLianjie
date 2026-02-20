@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.nh.smart.annotation.MultiRequestBody;
 import com.nh.smart.dao.record.SmartComWxmsgDao;
 import com.nh.smart.entity.base.Result;
+import com.nh.smart.entity.record.SmartComWxmsg;
 import com.nh.smart.util.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -32,6 +33,14 @@ public class V2CompatActionController {
             return JwtTokenUtil.getEmpno();
         } catch (Exception e) {
             return "";
+        }
+    }
+
+    private Integer safeUserid() {
+        try {
+            return JwtTokenUtil.getUserid();
+        } catch (Exception e) {
+            return 0;
         }
     }
 
@@ -193,6 +202,47 @@ public class V2CompatActionController {
         }
     }
 
+    @PostMapping("/QueryMessage")
+    public Result queryMessage(@RequestBody Map<String, Object> map) {
+        try {
+            String comid = safeComid();
+            String userid = String.valueOf(map.getOrDefault("userid", safeUserid()));
+            String msgtype = String.valueOf(map.getOrDefault("msgtype", ""));
+            String btagcode = String.valueOf(map.getOrDefault("btagcode", ""));
+            String otype = String.valueOf(map.getOrDefault("otype", ""));
+            long page = Long.parseLong(String.valueOf(map.getOrDefault("page", "1")));
+            long size = Long.parseLong(String.valueOf(map.getOrDefault("size", "10")));
+            IPage<SmartComWxmsg> data = smartComWxmsgDao.QueryMessage(new Page<>(page, size), comid, userid, msgtype, btagcode, otype);
+            JSONObject json = new JSONObject();
+            json.put("rows", data.getRecords());
+            json.put("total", data.getTotal());
+            json.put("totalpage", data.getPages());
+            return Result.successJson(json);
+        } catch (Exception e) {
+            return Result.successJson(emptyPageRowsArray());
+        }
+    }
+
+    @PostMapping("/updateStatus")
+    public Result updateStatus(@RequestBody Map<String, Object> map) {
+        try {
+            String comid = safeComid();
+            String msgid = String.valueOf(map.getOrDefault("msgid", ""));
+            if (msgid.isEmpty()) {
+                return Result.errorJson("msgid不能为空");
+            }
+            String status = String.valueOf(map.getOrDefault("status", "1"));
+            String oldStatus = smartComWxmsgDao.findStatus(comid, msgid);
+            if (oldStatus != null && oldStatus.equals(status)) {
+                return Result.successJson();
+            }
+            smartComWxmsgDao.updateStatus(comid, msgid, status);
+            return Result.successJson();
+        } catch (Exception e) {
+            return Result.errorJson("消息状态更新失败");
+        }
+    }
+
     @GetMapping("/getKjChat/{khuserid}/{empno}")
     public Result getKjChatByPath(@PathVariable String khuserid, @PathVariable String empno) {
         return getKjChatInternal(khuserid, empno, null);
@@ -242,4 +292,3 @@ public class V2CompatActionController {
         }
     }
 }
-

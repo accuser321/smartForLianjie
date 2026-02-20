@@ -89,6 +89,12 @@ public class SmartComKjLibwController {
         return Result.successJson(smartComKjLibwEmpno);
     }
 
+    // 兼容旧前端 query 形式：/selectOneBySno?btagcode=1&sno=xxx&flag=1
+    @GetMapping("/selectOneBySno")
+    public Result selectOneBySnoCompat(@RequestParam String btagcode, @RequestParam String sno, @RequestParam Integer flag) throws Exception {
+        return selectOneBySno(btagcode, sno, flag);
+    }
+
 
     /**
      * 文章导入
@@ -146,6 +152,12 @@ public class SmartComKjLibwController {
         return Result.successJson();
     }
 
+    // 兼容旧前端 query 形式：/ForwardWZ?sno=xxx&osno=yyy
+    @GetMapping("/ForwardWZ")
+    public Result forwardWZCompat(@RequestParam String sno, @RequestParam String osno) throws Exception {
+        return ForwardWZ(sno, osno);
+    }
+
 
     /**
      * 变成我的
@@ -171,6 +183,12 @@ public class SmartComKjLibwController {
         return Result.successJson(code);
     }
 
+    // 兼容旧前端 query 形式：/BecomeWZ?sno=xxx&osno=yyy&empno=zzz
+    @GetMapping("/BecomeWZ")
+    public Result becomeWZCompat(@RequestParam String sno, @RequestParam String osno, @RequestParam String empno) throws Exception {
+        return BecomeWZ(sno, osno, empno);
+    }
+
 
     /**
      * 我的素材列表删除
@@ -190,6 +208,12 @@ public class SmartComKjLibwController {
     public Result delete(@PathVariable String sno) throws Exception {
         smartComKjLibwService.delete(sno);
         return Result.successJson();
+    }
+
+    // 兼容旧前端 query 形式：/delete?sno=xxx
+    @DeleteMapping("/delete")
+    public Result deleteCompat(@RequestParam String sno) throws Exception {
+        return delete(sno);
     }
 
     /**
@@ -235,6 +259,25 @@ public class SmartComKjLibwController {
   })
   public Result selectKJFL(@PathVariable String tagcode) throws Exception {
     return Result.successJson(smartComKjLibwService.selectKJFL(tagcode));
+  }
+
+  // 兼容旧前端 query 形式：/selectKJFL?tagcode=xxx
+  @GetMapping("/selectKJFL")
+  public Result selectKJFLCompat(@RequestParam String tagcode) throws Exception {
+    return selectKJFL(tagcode);
+  }
+
+  @PostMapping("/insertWZ")
+  public Result insertWZ(@MultiRequestBody String title, @MultiRequestBody String text, @MultiRequestBody List<String> bq) throws Exception {
+    smartComKjLibwService.insertWZ(title, text, bq);
+    return Result.successJson();
+  }
+
+  @PutMapping("/updateWZ")
+  public Result updateWZ(@MultiRequestBody String sno, @MultiRequestBody String osno, @MultiRequestBody String title,
+                         @MultiRequestBody String text, @MultiRequestBody List<String> bq) throws Exception {
+    smartComKjLibwService.updateWZ(sno, osno, title, text, bq);
+    return Result.successJson();
   }
 
   /**
