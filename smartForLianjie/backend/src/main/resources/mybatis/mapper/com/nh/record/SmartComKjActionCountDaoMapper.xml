@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nh.smart.dao.record.SmartComKjActionCountDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.nh.smart.entity.record.SmartComKjActionCount">
+        <id column="comid" property="comid"/>
+        <result column="empno" property="empno"/>
+        <result column="userid" property="userid"/>
+        <result column="otype" property="otype"/>
+        <result column="btagcode" property="btagcode"/>
+        <result column="num" property="num"/>
+        <result column="lasttime" property="lasttime"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="sql_columns">
+            comid, empno, userid, jstype, num, lasttime
+    </sql>
+
+    <!-- 张宁 添加更新业务员行为次数-->
+    <insert id="insertActionCount">
+        insert into smart_com_kj_action_count(btagcode,empno, userid, otype, num, lasttime,comid)
+        values(
+        <if test="smartComKjActionCount.btagcode != null and smartComKjActionCount.btagcode != ''">
+            #{smartComKjActionCount.btagcode},
+        </if>
+        <if test='smartComKjActionCount.btagcode == null or smartComKjActionCount.btagcode == ""'>
+            null,
+        </if>
+        <if test="smartComKjActionCount.empno != null and smartComKjActionCount.empno != ''">
+            #{smartComKjActionCount.empno},
+        </if>
+        <if test='smartComKjActionCount.empno == null or smartComKjActionCount.empno == ""'>
+            null,
+        </if>
+        <if test="smartComKjActionCount.userid != null and smartComKjActionCount.userid != ''">
+            #{smartComKjActionCount.userid},
+        </if>
+        <if test='smartComKjActionCount.userid == null or smartComKjActionCount.userid == ""'>
+            null,
+        </if>
+        <if test="smartComKjActionCount.otype != null and smartComKjActionCount.otype != ''">
+            #{smartComKjActionCount.otype},
+        </if>
+        <if test='smartComKjActionCount.otype == null or smartComKjActionCount.otype == ""'>
+            null,
+        </if>
+        <if test="smartComKjActionCount.num != null and smartComKjActionCount.num != ''">
+            #{smartComKjActionCount.num},
+        </if>
+        <if test='smartComKjActionCount.num == null or smartComKjActionCount.num == ""'>
+            null,
+        </if>
+        <if test="smartComKjActionCount.lasttime != null">
+            #{smartComKjActionCount.lasttime},
+        </if>
+        <if test='smartComKjActionCount.lasttime == null'>
+            null,
+        </if>
+        #{smartComKjActionCount.comid}
+        )
+        on duplicate key update num = num + 1, lasttime = now()
+    </insert>
+
+    <!-- 张宁 计算名片或赞数-->
+    <select id="selectMpDzByEmpno" resultType="int">
+        SELECT
+        IFNULL( count( num ), 0 ) AS num
+        FROM
+        smart_com_kj_action_count
+        WHERE
+        comid = #{comid}
+        AND empno = #{empno}
+        AND otype = '4'
+        AND btagcode = '9'
+    </select>
+
+</mapper>

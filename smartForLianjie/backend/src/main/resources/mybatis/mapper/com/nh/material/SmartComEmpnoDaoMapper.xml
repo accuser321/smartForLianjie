@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nh.smart.dao.material.SmartComEmpnoDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.nh.smart.entity.material.SmartComEmpno">
+        <id column="comid" property="comid"/>
+        <result column="empno" property="empno"/>
+        <result column="empname" property="empname"/>
+        <result column="status" property="status"/>
+        <result column="cardtype" property="cardtype"/>
+        <result column="cardnum" property="cardnum"/>
+        <result column="passwd" property="passwd"/>
+        <result column="empopenid" property="empopenid"/>
+        <result column="empnickname" property="empnickname"/>
+        <result column="empheadimg" property="empheadimg"/>
+        <result column="lastlogintime" property="lastlogintime"/>
+        <result column="indate" property="indate"/>
+        <result column="outdate" property="outdate"/>
+        <result column="degreeno" property="degreeno"/>
+        <result column="tjempno" property="tjempno"/>
+        <result column="upempno" property="upempno"/>
+        <result column="operno" property="operno"/>
+        <result column="optime" property="optime"/>
+        <result column="sex" property="sex"/>
+        <result column="nality" property="nality"/>
+        <result column="nation" property="nation"/>
+        <result column="educational" property="educational"/>
+        <result column="birth" property="birth"/>
+        <result column="bankcode" property="bankcode"/>
+        <result column="bankzh" property="bankzh"/>
+        <result column="bankno" property="bankno"/>
+        <result column="zaddr" property="zaddr"/>
+        <result column="phone" property="phone"/>
+        <result column="fromtype" property="fromtype"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="sql_columns">
+            comid, empno, empname, status, cardtype, cardnum, passwd, empopenid, empnickname, empheadimg, lastlogintime, indate, outdate, degreeno, tjempno, upempno, operno, optime, sex, nality, nation, educational, birth, bankcode, bankzh, bankno, zaddr, phone,fromtype
+    </sql>
+
+    <!-- 工号密码查询 -->
+    <select id="verify" resultMap="BaseResultMap">
+        select comid,empno, empname, status, cardtype, cardnum, passwd, empopenid, empnickname, empheadimg,
+        lastlogintime, indate, outdate, degreeno, tjempno, upempno, operno, optime, sex, nality, nation, educational,
+        birth, bankcode, bankzh, bankno, zaddr, phone,fromtype
+        from smart_com_empno where ((empno = #{empno} and passwd = #{passwd}) or (phone = #{empno} and passwd  =  #{passwd}))  and comid = #{comid} and status in ('0','6')
+    </select>
+    <!-- 工号渠道查询 -->
+    <select id="selectByEmpno" resultMap="BaseResultMap">
+        select comid, empno, empname, status, cardtype, cardnum, passwd, empopenid, empnickname, empheadimg,
+        lastlogintime, indate, outdate, degreeno, tjempno, upempno, operno, optime, sex, nality, nation, educational,
+        birth, bankcode, bankzh, bankno, zaddr, phone,fromtype
+        from smart_com_empno where empno = #{empno} and comid = #{comid}
+    </select>
+
+    <!-- 获取用户信息 -->
+    <select id="getEmpno" resultType="java.util.Map">
+        SELECT distinct
+        a.empno, a.comid, a.empname, a.cardtype, a.cardnum, a.degreeno, a.tjempno, a.empnickname as nickname
+        ,a.empheadimg as headimg, a.degreename,
+        a.upempno, a.birth, a.zaddr,a.educational,a.nation,a.sex,a.nality,
+        b.empname AS tjname,
+        c.empname AS upname,
+        d.enumname AS sexName,
+        e.enumname AS nationName,
+        g.enumname AS educationalName,
+        a.status
+        FROM
+        smart_com_empno a
+        LEFT JOIN smart_com_empno b ON a.tjempno = b.empno and a.comid = b.comid
+        LEFT JOIN smart_com_empno c ON a.upempno = c.empno and a.comid = c.comid
+        left JOIN smart_com_enum d ON d.enumcode = a.sex and d.defcode = 'SEX' and a.comid = d.comid
+        LEFT JOIN smart_com_enum e ON e.enumcode = a.nation and d.defcode = 'MINZHU' and a.comid = e.comid
+        LEFT JOIN smart_com_enum g ON g.enumcode = a.educational and d.defcode = 'XUELI' and a.comid = g.comid
+
+        where a.empno = #{empno} and a.comid = #{comid}
+    </select>
+
+    <update id="updateWeixin">
+        update smart_com_empno set empnickname = #{nickname},empheadimg = #{headimg}, empopenid = #{openid} where empno = #{empno} and comid = #{comid}
+    </update>
+    <select id="verifyPhone" resultMap="BaseResultMap">
+         select comid, empno, empname, status, cardtype, cardnum, passwd, empopenid, empnickname, empheadimg,
+        lastlogintime, indate, outdate, degreeno, tjempno, upempno, operno, optime, sex, nality, nation, educational,
+        birth, bankcode, bankzh, bankno, zaddr, phone
+        from smart_com_empno where phone = #{phone} and status in ('0','6')and comid = #{comid}
+    </select>
+
+
+    <!-- 查询业务员表的用户信息 王名渤-->
+    <select id="selectInfoByEmpno" resultType="java.util.Map">
+          select ace.empname, ace.sex, ace.phone, ace.email
+          from smart_com_empno ace
+          where ace.empno = #{empno} and ace.comid = #{comid}
+      </select>
+</mapper>

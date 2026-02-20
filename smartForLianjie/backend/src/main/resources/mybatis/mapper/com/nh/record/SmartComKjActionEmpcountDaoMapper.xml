@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nh.smart.dao.record.SmartComKjActionEmpcountDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.nh.smart.entity.record.SmartComKjActionEmpcount">
+        <id column="comid" property="comid"/>
+        <result column="empno" property="empno"/>
+        <result column="tjdate" property="tjdate"/>
+        <result column="xzkhnum" property="xzkhnum"/>
+        <result column="wzzfnum" property="wzzfnum"/>
+        <result column="wzllnum" property="wzllnum"/>
+        <result column="mpzfnum" property="mpzfnum"/>
+        <result column="mpllnum" property="mpllnum"/>
+        <result column="mpdznum" property="mpdznum"/>
+        <result column="zxnum" property="zxnum"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="sql_columns">
+            comid, empno, tjdate, xzkhnum, wzzfnum, wzllnum, mpzfnum, mpllnum, mpdznum, zxnum
+    </sql>
+
+    <!-- 张宁 添加业务员每日行为统计-->
+    <insert id="insertActionEmpno">
+        insert into smart_com_kj_action_empcount(comid, empno, tjdate, xzkhnum, wzzfnum, wzzfsnum, wzllnum, mpzfnum, mpzfsnum, mpllnum, mpdznum, zxnum)
+        values(
+          #{smartComKjActionRecord.comid}, #{smartComKjActionRecord.empno}, now(), #{xzkhnum}, #{wzzfnum}, #{wzzfsnum},#{wzllnum},#{mpzfnum}, #{mpzfsnum},#{mpllnum},#{mpdznum},  #{zxnum}
+        )
+        on duplicate key update xzkhnum = #{xzkhnum}, wzzfnum = wzzfnum + #{wzzfnum}, wzzfsnum = wzzfsnum + #{wzzfsnum},  wzllnum = wzllnum + #{wzllnum}, mpzfnum = mpzfnum +#{mpzfnum}, mpzfsnum = mpzfsnum +#{mpzfsnum}, mpllnum = mpllnum + #{mpllnum}, mpdznum = mpdznum + #{mpdznum}, zxnum = zxnum + #{zxnum}
+    </insert>
+
+
+</mapper>

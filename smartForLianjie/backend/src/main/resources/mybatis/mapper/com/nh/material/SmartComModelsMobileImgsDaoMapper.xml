@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nh.smart.dao.material.SmartComModelsMobileImgsDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.nh.smart.entity.material.SmartComModelsMobileImgs">
+        <id column="comid" property="comid"/>
+        <result column="imgcode" property="imgcode"/>
+        <result column="imgname" property="imgname"/>
+        <result column="imgdesc" property="imgdesc"/>
+        <result column="imgsize" property="imgsize"/>
+        <result column="imgurl" property="imgurl"/>
+        <result column="operno" property="operno"/>
+        <result column="optime" property="optime"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="sql_columns">
+            comid, imgcode, imgname, imgdesc, imgsize, imgurl, operno, optime
+    </sql>
+    <!-- 手机端图片列表-->
+    <select id="pictureList" resultMap="BaseResultMap">
+        select imgcode,imgurl
+        from smart_com_models_mobile_imgs
+        where
+        comid=#{comid}
+    </select>
+
+</mapper>

@@ -1,0 +1,147 @@
+ spring:
+  profiles:
+    active:
+    - test
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+---
+server:
+ servlet:
+  session:
+    tracking-modes: cookie
+ # 会话sessionid存在cookie中,方便追踪,不设置会携带在url后面
+---
+spring:
+  servlet:
+    multipart:
+      enabled: true #可以启动http上传
+      max-file-size: 10MB  #支持单个文件大小的限制
+      max-request-size: 20MB  #设置总大小的限制
+      file-size-threshold: 512KB #当达到配置量写入磁盘
+      location: / #上传的临时目录
+---
+      #===注意===多数据源配置方案中是jdbc-url 或者 url
+      #===注意===如果使用springboot2中默认HikariDataSource数据源时,使用jdbc-url
+                #如果使用DruidDataSource替换HikariDataSource数据源时,使用url
+spring:
+ datasource:
+    primary:
+      type: com.alibaba.druid.pool.DruidDataSource  #配置当前要使用的数据源操作类型(数据源配置)
+      url: "jdbc:mysql://54.223.26.213:3306/smart?characterEncoding=UTF-8&serverTimezone=GMT%2B8"         #数据库连接地址
+      username: root
+      password: NHceshi2019@@TeamDBTeam
+      platform: mysql
+      driver-class-name: com.mysql.jdbc.Driver
+    druid:
+      #连接池配置
+      initial-size: 5  # 初始化大小
+      min-idle: 5  # 最小
+      max-active: 100  # 最大
+      max-wait: 60000  # 连接超时时间
+      poolPreparedStatements: true
+      maxPoolPreparedStatementPerConnectionSize: 20
+      validationQuery: SELECT 1 FROM DUAL
+      validation-query-timeout: 60000
+      test-on-borrow: true  # 当从连接池借用连接时，是否测试该连接(true 解决 Communications link failure)
+      test-on-return: true  # 在连接归还到连接池时是否测试该连接(true 解决 Communications link failure)
+      test-while-idle: true  # 当连接空闲时，是否执行连接测试
+      time-between-eviction-runs-millis: 60000  # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
+      min-evictable-idle-time-millis: 300000  # 指定一个空闲连接最少空闲多久后可被清除，单位是毫秒
+      #监控配置 bengin
+      web-stat-filter:
+        enabled: true
+        url-pattern: /*
+        exclusions: /druid/*,*.js,*.gif,*.jpg,*.bmp,*.png,*.css,*.ico
+        session-stat-enable: true
+        session-stat-max-count: 10
+      stat-view-servlet:
+        enabled: true
+        url-pattern: /druid/*
+        reset-enable: false
+        login-username: admin
+        login-password: admin
+        allow: 127.0.0.1
+        #监控配置 end
+      #配置StatFilter
+      filter:
+        slf4j:
+          enabled: true
+          statement-create-after-log-enabled: false
+          statement-log-enabled: false
+          statement-executable-sql-log-enable: true
+          statement-log-error-enabled: true
+          statement-close-after-log-enabled: false
+          result-set-open-after-log-enabled: false
+          result-set-close-after-log-enabled: false
+          result-set-log-enabled: false
+        stat:
+          db-type: mysql
+          log-slow-sql: true
+          slow-sql-millis: 5000
+      #配置WallFilter
+        wall:
+          enabled: false
+          db-type: mysql
+          config:
+            delete-allow: false
+            drop-table-allow: false
+      #filters: config,wall,stat  # 配置监控统计拦截的filters，去掉后监控界面sql无法统计，'wall'用于防火墙
+---
+#mybatis plus 配置SQL打印功能
+logging:
+  level:
+    root: warn
+    com.nh.smart.dao: debug
+  pattern:
+    console: '%p%m%n'
+---
+mybatis-plus:
+  configuration:  #配置控制台打印完整带参数SQL语句
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  mapper-locations: classpath:mybatis/mapper/com/nh/**/*.xml                 #所有的mapper映射文件
+  global-config:
+    db-config:
+      id-type: auto   #MP的全局ID策略,auto为数据库自增
+  type-aliases-package: com.nh.smart.entity            #全路径名设置,影响src/main/resourecs/mybatis/mapper/com/nh/xxxMapper.xml中的resultType的路径名
+---
+spring:
+  datasource:
+    dbcp2:
+      min-idle: 5 #数据库连接池的最小维持连接数(连接池配置)
+      initial-size: 5 #初始化提供的连接数
+      max-total: 5  #最大的连接数
+      max-wait-millis: 200  #等待连接获取的最大的超时时间
+---
+management:
+  endpoint:
+    shutdown:
+      enabled: true               #actuator监控,关闭安全验证,可以访问/actuator/health
+    info:
+      enabled: true               #true为开启info中增加的额外内容
+    health:
+      show-details: ALWAYS        #自定义MyHealthIndicator,包含health要显示的监控详细信息
+  endpoints:
+    enabled-by-default: true      #false为禁用所有其他端点
+    web:                          #由于包含敏感信息,web端默认只公开health,info信息
+      exposure:
+        include:                  #通过HTTP公开除env和beans端点之外的所有内容
+        - "*"
+        exclude:
+        - "env,beans"             #停止通过web公开所有端点并仅公开health和info端点
+      cors:
+        allowed-origins:
+        - localhost
+        allowed-methods:
+        - GET,POST
+---
+logging:
+# path: c:/logs
+  config: classpath:log4j2-spring.xml
+---
+jwt:
+   secret: eyJleHAiOjE1NDMyU5RyODUsNaf1YiI6ImcDbWluIiwiT6J8
+   expiration: 3000000
+   header: Authorization
+   token_start: Bearer
+   refresh: 1500000

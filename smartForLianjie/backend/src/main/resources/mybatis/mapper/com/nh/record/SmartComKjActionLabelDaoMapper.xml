@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nh.smart.dao.record.SmartComKjActionLabelDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.nh.smart.entity.record.SmartComKjActionLabel">
+        <id column="comid" property="comid"/>
+        <result column="userid" property="userid"/>
+        <result column="suserid" property="suserid"/>
+        <result column="empno" property="empno"/>
+        <result column="labid" property="labid"/>
+        <result column="lastuptime" property="lastuptime"/>
+        <result column="num" property="num"/>
+        <result column="fromsctype" property="fromsctype"/>
+        <result column="fromsno" property="fromsno"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="sql_columns">
+            comid, userid, suserid, empno, labid, lastuptime, num, fromsctype, fromsno
+    </sql>
+
+    <!-- 张宁 添加标签行为-->
+    <insert id="insertActionLabel">
+        insert into smart_com_kj_action_label(comid, userid, suserid, empno, labid, lastuptime, num, fromsctype, fromsno)
+        values
+        <foreach collection="labidlist" separator="," item="item">
+            (#{smartComKjActionRecord.comid},
+            #{smartComKjActionRecord.userid},#{smartComKjActionRecord.suserid},#{smartComKjActionRecord.empno},#{item},now(),1,#{smartComKjActionRecord.btagcode},#{smartComKjActionRecord.sno})
+        </foreach>
+        on duplicate key update num = num + 1, lastuptime = now()
+    </insert>
+</mapper>

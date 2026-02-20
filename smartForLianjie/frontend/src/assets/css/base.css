@@ -1,0 +1,296 @@
+@charset "utf-8";
+/* 禁用iPhone中Safari的字号自动调整 */
+html {
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  width: 100%;
+  height: 100%;
+}
+
+/* 去除iPhone中默认的input样式 */
+input,
+textarea,
+select {
+  -webkit-appearance: none;
+  appearance: none;
+  -webkit-appearance: none;
+  appearance: none;
+  border: none;
+  outline: none;
+  resize: none;
+}
+
+/* 取消链接高亮  */
+body,
+div,
+ul,
+li,
+ol,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+input,
+textarea,
+select,
+p,
+dl,
+dt,
+dd,
+a,
+img,
+button,
+form,
+table,
+th,
+tr,
+td,
+tbody,
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+menu,
+nav,
+section {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+br {
+  content: normal;
+}
+
+/* 设置HTML5元素为块 */
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+menu,
+nav,
+section {
+  display: block;
+}
+
+/* 图片自适应 */
+img {
+  max-width: 100%;
+  height: 100%;
+  width: 100%;
+  content: normal !important;
+  -ms-interpolation-mode: bicubic; /*为了照顾ie图片缩放失真*/
+}
+
+*:focus {
+  outline: none;
+}
+
+/* 清零 */
+body,
+div,
+ul,
+li,
+ol,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+input,
+textarea,
+select,
+p,
+dl,
+dt,
+dd,
+a,
+img,
+button,
+form,
+table,
+th,
+tr,
+td,
+tbody,
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+menu,
+nav,
+section {
+  margin: 0;
+  padding: 0;
+  border: none;
+  box-sizing: border-box;
+}
+
+body {
+  color: #000;
+  width: 100%;
+  height: 100%;
+  background: #f9f9f9;
+}
+
+em,
+i {
+  font-style: normal;
+}
+
+strong {
+  font-weight: normal;
+}
+
+/*清楚浮动*/
+.clearfix:after {
+  content: '';
+  display: block;
+  visibility: hidden;
+  height: 0;
+  line-height: 0;
+  clear: both;
+}
+
+.clearfix {
+  zoom: 1;
+}
+
+a {
+  text-decoration: none;
+  color: #333;
+}
+
+a:hover {
+  text-decoration: none;
+}
+
+ul,
+ol,
+li {
+  list-style: none;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-size: 100%;
+}
+
+fieldset,
+img {
+  border: none;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+caption,
+th {
+  text-align: left;
+}
+
+q:before,
+q:after {
+  content: '';
+}
+
+.scope {
+  min-width: 320px;
+  max-width: 750px;
+  margin: 0 auto;
+  font-size: 0.28rem;
+  background-color: #eeeeee;
+}
+
+.fl {
+  float: left;
+}
+
+.fr {
+  float: right;
+}
+
+button {
+  border: none;
+  outline: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+button:after {
+  border: none !important;
+}
+.boxShow {
+  box-shadow: 0 0.2rem 0.8rem 0.01rem rgba(80, 10, 186, 0.08);
+}
+.iconfont {
+  font-size: 50px;
+}
+
+/*
+  主题样式背景
+*/
+
+/* 主色调 */
+.context_bg {
+  background: #3296fa !important;
+}
+/* 按钮禁用 */
+.disable_bg {
+  background: #4881ba !important;
+}
+/* 上传刷新 */
+.secondary_bg {
+  background: #3db8f4 !important;
+}
+/* 间隔色 */
+.interval {
+  background: #f5f4f7 !important;
+}
+/*
+  主题样式字体颜色
+*/
+/* 主色调 */
+.context {
+  color: #3296fa !important;
+}
+/* 深色 */
+.dark_color {
+  color: #1e1e1e !important;
+}
+/* 浅色 */
+.light_color {
+  color: #666 !important;
+}
+/* 备注 */
+.remark_color {
+  color: #85888c !important;
+}
+/* 提示色 */
+.hint_color {
+  color: #ccc !important;
+}

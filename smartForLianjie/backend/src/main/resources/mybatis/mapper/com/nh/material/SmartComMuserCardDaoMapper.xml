@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nh.smart.dao.material.SmartComMuserCardDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.nh.smart.entity.material.SmartComMuserCard">
+        <id column="comid" property="comid"/>
+        <result column="empno" property="empno"/>
+        <result column="cardempname" property="cardempname"/>
+        <result column="cardsex" property="cardsex"/>
+        <result column="cardmobile" property="cardmobile"/>
+        <result column="workarea" property="workarea"/>
+        <result column="email" property="email"/>
+        <result column="pdesc" property="pdesc"/>
+        <result column="wxnumber" property="wxnumber"/>
+        <result column="wxewmurl" property="wxewmurl"/>
+        <result column="carddegreeno" property="carddegreeno"/>
+        <result column="cardstyle" property="cardstyle"/>
+        <result column="flushtime" property="flushtime"/>
+        <result column="headimg" property="headimg"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="sql_columns">
+            comid, empno, cardempname, cardsex, cardmobile, workarea, email, pdesc, wxnumber, wxewmurl, carddegreeno, flushtime, cardstyle
+    </sql>
+
+    <!-- 通用更新字段 -->
+    <sql id="sql_update">
+        update smart_com_muser_card
+        <set>
+            <if test="null != item.cardempname">cardempname = #{item.cardempname},</if>
+            <if test="null != item.cardsex">cardsex = #{item.cardsex},</if>
+            <if test="null != item.cardmobile">cardmobile = #{item.cardmobile},</if>
+            <if test="null != item.workarea">workarea = #{item.workarea},</if>
+            <if test="null != item.email">email = #{item.email},</if>
+            <if test="null != item.pdesc">pdesc = #{item.pdesc},</if>
+            <if test="null != item.wxnumber">wxnumber = #{item.wxnumber},</if>
+            <if test="null != item.wxewmurl">wxewmurl = #{item.wxewmurl},</if>
+            <if test="null != item.carddegreeno">carddegreeno = #{item.carddegreeno},</if>
+            <if test="null != item.cardstyle">cardstyle = #{item.cardstyle},</if>
+            flushtime = now()
+        </set>
+        where comid = #{comid} and empno = #{empno}
+    </sql>
+
+    <!-- 查询业务员名片 王名渤-->
+    <select id="selectUserCard" resultMap="BaseResultMap">
+        SELECT acmc.cardempname, acmc.cardsex, acmc.cardmobile, acmc.workarea, acmc.email, acmc.pdesc,
+        acmc.wxnumber, acmc.wxewmurl, acmc.carddegreeno,acmc.cardstyle,acm.headimg,
+        count( DISTINCT CASE WHEN ackar.btagcode = '9' and ackar.otype = '1' THEN ackar.userid END ) AS mpbrowsenum,
+        count( DISTINCT CASE WHEN ackar.btagcode = '9' and ackar.otype = '2' THEN ackar.userid END ) AS mpforwardnum
+        FROM smart_com_muser_card acmc
+        left join smart_com_muser acm on acmc.comid = acm.comid
+        and acmc.empno = acm.empno
+        left join smart_com_kj_action_record as ackar
+        on acmc.comid = ackar.comid and acmc.empno = ackar.empno and ackar.userid != ackar.suserid and ackar.btagcode in
+        ('9')
+        where acmc.comid = #{comid} and acmc.empno = #{empno}
+    </select>
+
+    <!-- 名片编辑 王名渤-->
+    <update id="updateCard">
+        <include refid="sql_update"/>
+    </update>
+
+    <!-- 修改头像信息 王名渤-->
+    <update id="updateHeadimg">
+        update smart_com_muser set headimg = #{headimg} where comid = #{comid} and userid = #{userid}
+    </update>
+
+    <!-- 查询业务员名片信息 王名渤-->
+    <select id="selectCardInfo" resultMap="BaseResultMap">
+        select acmc.cardempname,acmc.cardmobile,acm.headimg from smart_com_muser_card acmc
+        left join smart_com_muser acm on acmc.comid = acm.comid  and acmc.empno = acm.empno
+        where acmc.comid = #{comid} and acmc.empno= #{empno}
+    </select>
+
+    <!-- 查询默认渠道默认风采照片和微官网 王名渤-->
+    <select id="getDefaultPhotoAndWebSite" resultType="java.util.Map">
+        select setcode,setcontent from smart_com_system_setting where defcode in('FCPHOTO','WEBSITE')
+        and comid = #{comid} and setcode in('FCPHOTO','WEBSITE')
+    </select>
+
+    <!-- 根据empno和人员类型查询用户userid、微信头像、openid 王名渤-->
+    <select id="getUserInfo" resultType="java.util.Map">
+        select acm.userid, acm.headimg, acm.openid
+        from smart_com_muser acm
+        where acm.comid = #{comid} and acm.status = '0'
+        and acm.empno = #{empno}
+    </select>
+
+    <!-- 查询名片照片 王名渤-->
+    <select id="selectPhotoList" resultType="java.lang.String">
+        select souhttp from smart_com_empno_sourceinfo where comid = #{comid}
+        and empno = #{empno} and soucode = #{soucode} and status = '0'
+    </select>
+</mapper>

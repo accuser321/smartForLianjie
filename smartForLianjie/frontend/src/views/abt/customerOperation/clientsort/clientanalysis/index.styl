@@ -1,0 +1,311 @@
+.allcontent{
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -webkit-box-orient: vertical;
+  width 100%;
+  height 100vh
+}
+.topback {
+  background-color: color-primary;
+  position: relative;
+  height: 3.5rem;
+}
+.top {
+    background-color: #fff;
+    height: 2.7rem;
+    width: 90%;
+    position: relative;
+    left: 5%;
+    top: .8rem;
+    border-top-left-radius: 0.4rem;
+    border-top-right-radius: 0.4rem;
+    padding .3rem
+  .name {
+    margin-left: .5rem;
+    div{
+      line-height: .64rem;
+    }
+    div:nth-child(1){
+      font-size .35rem
+    }
+    div:nth-child(2){
+      color rgb(136, 136, 136)
+    }
+  }
+  .headimg{
+    width 1.5rem
+    height 1.5rem  
+    border-radius 50%
+  }
+}
+.setmid{
+    img{
+        width .7rem
+    }
+}
+.labbox{
+  width: 80%;
+  height: 1rem;
+  margin: 0 0 0 1.9rem;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -ms-flex-pack: distribute;
+  justify-content: space-around;
+}
+.labtit{
+    width: 28%;
+    height: .59rem;
+    line-height: .59rem;
+    /* height: 60%; */
+    border: 1px solid #d9d9d9;
+    border-radius: 0.5rem;
+    text-overflow: ellipsis;
+    color: #ccc;
+    font-size: 0.3rem;
+    text-align: center;
+}
+.labact{
+  color:#000;
+}
+.leftlabel{
+  width 1.6rem;
+  display:inline-block
+  text-align-last: justify;
+  margin-right .3rem
+}
+.addlab{
+  height: 70%;
+  margin-left: 5px;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  img{
+    width .4rem
+    height .4rem
+  }
+}
+.infobox {
+  width: 90%;
+  margin: 0 0 0.3rem 5%;
+  border-bottom-left-radius: 40px;
+  border-bottom-right-radius: 40px;
+  overflow: hidden;
+  box-shadow: 0rem 0.1rem 0.1rem #e8e4e4;
+  line-height: 1rem;
+}
+.open {
+  transform: rotateX(180deg);
+  transition: all 0.4s;
+}
+.close {
+  height: 0;
+  overflow: hidden;
+  transition: all 0.4s;
+}
+.item_input{
+  text-align center  
+  color rgb(102, 102, 102)
+}
+.list_item{
+  margin-left: .4rem;
+}
+.item_title{
+  span{
+    font-size .35rem;
+    color rgb(102, 102, 102)
+  }
+}
+.lastitem{
+  font-size .3rem;
+  text-align center
+  margin 0
+  color rgb(204, 204, 204);
+}
+// 标签选择
+  .md-example-popup{
+    background-color white
+    height 100%;
+    overflow-y auto
+  }
+  .allcontent /deep/ .md-popup-box{
+    height 80%!important
+    overflow-y hidden
+  }
+  .bqdialog /deep/ .md-dialog-content{
+    width 7rem!important
+  }
+  .list{
+    padding:1rem .5rem
+    margin-bottom: .8rem;
+  }
+  .bqbox{
+    padding-bottom .5rem
+    p{
+      font-size .5rem
+      font-weight bold
+      margin-bottom .2rem
+    }
+    .bqdiv{
+      span{
+        display: inline-block;
+        height: .8rem;
+        width: 25%;
+        line-height: 0.8rem;
+        text-align: center;
+        margin: 0.1rem 0.25rem;
+        font-size: 0.35rem;
+        border 1px solid color-primary
+        color color-primary
+      }
+      .active{
+        background-color color-primary
+        color white
+      }
+    }
+  }
+  .bqtable{
+    width: 100%;
+    border: 1px solid #ccc;
+    padding-left: 0.3rem;
+    height: 1rem;
+    border-radius: 0.3rem;
+  }
+  // 编辑信息
+  #searchPage{
+    /deep/.md-popup-box{
+      width 100%;
+      height 100%!important;
+    }
+    /deep/ .md-popup-mask{
+      background-color: white
+    }  
+  }
+  .listbox {
+    margin-bottom: 1.5rem;
+    height: 90%;
+    overflow-y: auto;
+     /deep/ .md-field-item-title{
+        font-size .35rem
+        width 1.9rem
+      }
+      /deep/ .md-input-item-input{
+        font-size: 0.35rem;
+        color: #8a8a8a;
+      }
+      /deep/ .md-icon.icon-font.md{
+        font-size .55rem
+      }
+      /deep/ .md-radio-label{
+        font-size .4rem
+      }
+      /deep/ .md-field-item-content{
+        padding:.3rem 0
+      } 
+      /deep/ .shape-quarter{
+        height .4rem
+        width .4rem
+      } 
+      /deep/ .md-check-base-box{
+        padding: 0.19rem 0.4rem;
+        margin-right: 0.3rem;
+      }
+  }
+  .zjpick /deep/ .md-field-item-content{
+    padding:.6rem 0!important
+  }
+  .radiobox{
+    /deep/ .md-icon.icon-font.md{
+        font-size .32rem
+    }
+  }
+  .example{
+    /deep/ .md-textarea-item__textarea{
+      min-height: 3rem;
+      border: 1px solid #ccc;
+      padding: .3rem;
+    }
+  }
+  .btnbox{
+    text-align center
+    height: 8%;
+    position:absolute;
+    bottom: 0;
+    width:100%;
+    display: flex;
+    align-items: center; /*定义body的元素垂直居中*/
+    justify-content: center; /*定义body的里的元素水平居中*/
+    div{
+      width 40%
+      height 100%
+      font-size: .45rem;
+      border-radius 20px;
+      margin 5% 
+      height: 1rem;
+      line-height: 1rem;
+    }
+    .cancel{
+      border 1px solid color-primary
+      color color-primary
+    }
+    .savebtn{
+      background-color: color-primary;
+      color: white;
+    }
+  }
+  .datepick{
+    /deep/ .md-popup-box{
+      height 45%!important
+    }
+    /deep/ .md-popup-mask{
+      background-color: rgba(37,38,45,0.7);
+    }
+  }
+  .tabbar{
+    background-color:#F3F3F3;
+    padding-top: .2rem;
+    padding-bottom: .2rem;
+    /deep/ .md-tab-bar-item{
+      font-size: 0.45rem;
+    }
+    /deep/ .md-tab-bar-item.is-active{
+      color color-primary
+    } 
+  }
+  .tabcontent {
+  -webkit-box-flex: 1;
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  background: white;
+}
+.tozxzx {
+  margin-right: -0.3rem;
+  position: fixed;
+  z-index: 10;
+  bottom: 3.5rem;
+  right: 0.5rem;
+}
+.tozxzx img {
+  width: 12vw;
+}
+   
+ 
+

@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nh.smart.dao.record.SmartComMuserDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.nh.smart.entity.record.SmartComMuser">
+        <id column="comid" property="comid"/>
+        <result column="userid" property="userid"/>
+        <result column="openid" property="openid"/>
+        <result column="nickname" property="nickname"/>
+        <result column="headimg" property="headimg"/>
+        <result column="empno" property="empno"/>
+        <result column="rytype" property="rytype"/>
+        <result column="regtime" property="regtime"/>
+        <result column="bdtime" property="bdtime"/>
+        <result column="lastlogintime" property="lastlogintime"/>
+        <result column="status" property="status"/>
+        <result column="acvitivy" property="acvitivy"/>
+        <result column="fromempno" property="fromempno"/>
+        <result column="fromsctype" property="fromsctype"/>
+        <result column="fromsno" property="fromsno"/>
+        <result column="num" property="num"/>
+        <result column="custprovince" property="custprovince"/>
+        <result column="custcity" property="custcity"/>
+        <result column="custsex" property="custsex"/>
+        <result column="empname" property="empname"/>
+        <result column="empphone" property="empphone"/>
+        <result column="yzm" property="yzm"/>
+        <result column="yzmtime" property="yzmtime"/>
+        <result column="mobile" property="mobile"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="sql_columns">
+            comid, userid, openid, nickname, headimg,empno, rytype, regtime, bdtime, lastlogintime, status, acvitivy, fromempno, fromsctype, fromsno,custprovince,custcity,custsex,yzm
+            ,yzmtime,mobile
+    </sql>
+
+    <!-- 查询最大userid-->
+    <select id="getMaxUserId" resultType="java.lang.String">
+        select
+		userid
+		from smart_com_muser
+		order by CAST(userid AS SIGNED) desc limit 1
+    </select>
+
+    <!-- 根据openid获取用户信息 -->
+    <select id="selectByUserId" resultType="com.nh.smart.entity.record.SmartComMuser">
+        select
+        comid, userid, popenid, openid, nickname, headimg,empno, rytype, regtime, bdtime, lastlogintime,
+        status, acvitivy, fromempno, fromsctype, fromsno, custsex, yzm, yzmtime, mobile, tjempno,
+        case when promotionprice is null or promotionprice = '' then 0 else promotionprice end as promotionprice
+        from smart_com_muser
+        where openid = #{openid} and comid = #{comid} and status = '0';
+    </select>
+
+    <!-- 根据外勤工号empno获取用户信息 王名渤 -->
+    <select id="selectByEmpno" resultType="com.nh.smart.entity.record.SmartComMuser">
+        select
+        comid, userid, openid, nickname, headimg,empno, rytype, regtime, bdtime, lastlogintime,
+        status, acvitivy, fromempno, fromsctype, fromsno, custsex, yzm, yzmtime, mobile, tjempno,
+        case when promotionprice is null or promotionprice = '' then 0 else promotionprice end as promotionprice
+        from smart_com_muser
+        where empno = #{empno} and comid = #{comid} and rytype = 'W' and status = '0';
+    </select>
+
+    <!-- 解绑微信 -->
+    <update id="delOpenid">
+        update smart_com_muser set rytype = 'Y' where openid = #{userid} and comid = #{comid}
+    </update>
+
+    <!-- 删除业务员相关微信信息 -->
+    <update id="delWeiXin">
+        update  smart_com_empno set empnickname = '',empheadimg = '', empopenid = '' where empno = #{empno} and comid = #{comid}
+    </update>
+
+    <!-- 获取是否存在绑定过用户 -->
+    <select id="getByEmpno" resultMap="BaseResultMap">
+        select
+        comid, userid,openid, nickname, headimg,empno, rytype, regtime, bdtime, lastlogintime,
+        status, acvitivy, fromempno, fromsctype, fromsno, custsex, yzm, yzmtime, mobile
+        from smart_com_muser
+        where empno = #{empno} and comid = #{comid} and `status` = '0';
+    </select>
+
+    <!-- 根据userid获取用户信息 -->
+    <select id="selectByUser" resultMap="BaseResultMap">
+        select
+        comid, userid, openid, nickname, headimg, empno, rytype, regtime, bdtime, lastlogintime,
+        status, acvitivy, fromempno, fromsctype, fromsno,yzm, yzmtime, mobile
+        from smart_com_muser
+        where userid = #{userid} and comid = #{comid} and status = '0';
+    </select>
+    <!--获取用户名片信息 -->
+    <select id="getCard" resultType="Map">
+        select cardempname,cardmobile,wxnumber from smart_com_muser_card where empno = #{empno} and comid = #{comid}
+    </select>
+    <!--根据手机号获取客户信息 -->
+    <select id="isRegister" resultType="String">
+    select count(userid) as num  from smart_com_muser where  rytype not in ('Y') and `status` = '0' and comid =#{comid} and mobile = #{phone}
+    </select>
+    <!--根据手机号获取业务员-->
+    <select id="empnoIsRegister" resultType="String">
+    select count(cardnum) as num  from smart_com_empno where `status` in ('0','6') and comid = #{comid} and phone = #{phone}
+    </select>
+
+    <!-- 获取微信配置-->
+    <select id="getWxInfo" resultType="Map">
+        select appid, appsecrt, stylenum, ossurl,ossaccesskeyid,ossaccesskeysecret,ossbucket from smart_com_setting where comid = #{comid}
+    </select>
+</mapper>

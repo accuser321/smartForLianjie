@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nh.smart.dao.record.SmartComKjActionRecordDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.nh.smart.entity.record.SmartComKjActionRecord">
+        <id column="id" property="id"/>
+        <result column="comid" property="comid"/>
+        <result column="userid" property="userid"/>
+        <result column="suserid" property="suserid"/>
+        <result column="empno" property="empno"/>
+        <result column="btagcode" property="btagcode"/>
+        <result column="stagcode" property="stagcode"/>
+        <result column="sno" property="sno"/>
+        <result column="osno" property="osno"/>
+        <result column="acttimes" property="acttimes"/>
+        <result column="begtime" property="begtime"/>
+        <result column="hashnum" property="hashnum"/>
+        <result column="stitle" property="stitle"/>
+        <result column="remark" property="remark"/>
+        <result column="cpname" property="cpname"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="sql_columns">
+            id, comid, userid, suserid, empno, otype, btagcode, stagcode, sno, osno, acttimes, begtime, hashnum,remark
+    </sql>
+
+    <!-- 张宁 根据用户openid查询用户userid-->
+    <select id="selectUseridByOpenid" resultType="java.util.Map">
+        select userid,openid,empno,rytype,nickname,headimg from smart_com_muser
+        <where>
+            <if test="openid != null and openid != ''">
+                openid = #{openid}
+            </if>
+            <if test="empno != null and empno != ''">
+              empno = #{empno}
+            </if>
+            <if test="rytype != null and rytype != ''">
+                and rytype = #{rytype}
+            </if>
+            and comid = #{comid} and status = '0'
+        </where>
+    </select>
+
+    <!-- 张宁 查询客户是否为准客户-->
+    <select id="selectCustomLabel" resultType="java.lang.Integer">
+        select count(1) from smart_com_kj_custom_label
+        where
+        comid = #{comid} and userid = #{userid} and empno = #{empno} and labid = #{labid}
+    </select>
+
+    <!-- 张宁 更新行为记录浏览时间-->
+    <update id="updateActionCordTime">
+        update smart_com_kj_action_record set acttimes = #{userAction.time}, hashnum = #{userAction.hashnum},
+        <if test="userAction.time != null">
+            begtime = #{userAction.begin}
+        </if>
+        <if test='userAction.time == null'>
+            begtime = now()
+        </if>
+        where id = #{userAction.id}
+    </update>
+
+    <!-- 张宁 获取业务员行为记录-->
+    <select id="getKHRelation" resultMap="BaseResultMap">
+        SELECT
+        record.userid,
+        record.suserid,
+        record.suserid AS parentId,
+        record.userid AS treeid,
+        muser.headimg,
+        CASE
+        WHEN basemsg.NAME IS NULL THEN
+        muser.nickname ELSE basemsg.NAME
+        END AS khname
+        FROM
+        smart_com_kj_action_record AS record
+        LEFT JOIN smart_com_kj_custom_basemsg AS basemsg ON record.empno = basemsg.empno
+        AND record.userid = basemsg.userid
+        AND record.comid = basemsg.comid
+        LEFT JOIN smart_com_muser AS muser ON record.userid = muser.userid
+        AND record.comid = muser.comid
+        WHERE
+        <if test="sno != null and sno != ''">
+          record.sno=#{sno} and
+        </if>
+        record.comid = #{comid} and record.empno = #{empno} and record.userid != #{userid} and record.userid != record.suserid and muser.status = '0' GROUP BY userid,suserid
+    </select>
+
+    <!-- 张宁 文章-谁看了我-谁转发了我-->
+    <select id="getWZRdZf" resultType="java.util.Map">
+        select
+        muser.userid as khuserid,
+        muser.headimg,
+        case when basemsg.name is null or basemsg.name = ''
+        then muser.nickname else basemsg.name end as khname,
+        muser.custprovince,
+        muser.custcity,
+        record.begtime,
+        case when record.acttimes is null then -1 else record.acttimes end as acttimes,
+        case when empship.tsflag = '1' then '0' when empship.tsflag = '0' and empship.zkhflag = '1' then '1' else '2'
+        end as flag
+        from smart_com_kj_action_record as record
+        left join smart_com_kj_custom_basemsg as basemsg
+        on record.empno = basemsg.empno and record.userid = basemsg.userid and record.comid = basemsg.comid
+        left join smart_com_muser as muser
+        on record.userid = muser.userid and record.comid = muser.comid
+        left join smart_com_kj_custom_empship as empship
+        on record.userid = empship.userid and empship.comid = empship.comid and record.empno = empship.empno
+        where
+        record.comid = #{comid}
+        and record.userid != #{userid}
+        and record.empno = #{empno}
+        <if test="sno != null and sno != ''">
+            and record.sno = #{sno}
+        </if>
+        and record.btagcode = #{recordtype}
+        and record.otype = #{type}
+        and muser.status = '0'
+        order by begtime desc
+    </select>
+
+
+    <!-- 张宁 查询文章是否已经推送过-->
+    <select id="selectWZread" resultType="int">
+        select count(*)
+        from
+        smart_com_kj_action_record
+        where
+        comid = #{comid}
+        and userid = #{userid}
+        and suserid = #{suserid}
+        and empno = #{empno}
+        and otype = '1'
+        and btagcode = #{btagcode}
+        and sno = #{sno}
+        and osno = #{osno}
+    </select>
+
+    <!-- 张宁 查询此用户文章是否转发过-->
+    <select id="selectZF" resultType="java.lang.String">
+        select count(*)
+        from
+        smart_com_kj_action_record
+        where
+        userid = #{smartComKjActionRecord.userid}
+        and suserid = #{smartComKjActionRecord.suserid}
+        and empno = #{smartComKjActionRecord.empno}
+        and otype = #{smartComKjActionRecord.otype}
+        and btagcode = #{smartComKjActionRecord.btagcode}
+        and sno = #{smartComKjActionRecord.sno}
+    </select>
+
+    <!-- 张宁 修改素材二转数-->
+    <select id="updateSCNUM">
+        update smart_com_kj_libw_empno
+        <set>
+            <if test="kullnum != null">
+                kullnum = CASE
+                WHEN kullnum IS NULL THEN 1 else kullnum + #{kullnum}
+                END,
+            </if>
+            <if test="wzzfsnum != 0">
+                zfsnum = CASE
+                WHEN zfsnum IS NULL THEN 1 else zfsnum + #{wzzfsnum}
+                END,
+                khzfnum = CASE
+                WHEN khzfnum IS NULL THEN 1 else khzfnum + #{khnum}
+                END,
+            </if>
+            <if test='llnum != null'>
+                ydnum = CASE
+                WHEN ydnum IS NULL THEN 1 else ydnum + #{llnum}
+                END
+            </if>
+        </set>
+        where
+        sno = #{smartComKjActionRecord.sno}
+        and comid = #{smartComKjActionRecord.comid}
+    </select>
+
+    <!-- 张宁 查询业务员信息-->
+    <select id="selectUseridByUserid" resultType="java.util.Map">
+      select userid,openid,empno,rytype,nickname,headimg from smart_com_muser
+      <where>
+        userid = #{ywuserid}
+        and comid = #{comid} and status = '0'
+      </where>
+    </select>
+
+  <!-- 张宁 点赞状态-->
+  <select id="selectDZFlag" resultType="java.lang.Integer">
+        select count(*) from smart_com_kj_custom_empship where  comid = #{comid} and empno = #{empno} and userid = #{userid} and praiseflag = '1'
+    </select>
+
+
+  <!-- 张宁 统计多少个人浏览过-->
+  <select id="selectCardKH" resultType="java.util.Map">
+        SELECT DISTINCT
+            muser.headimg
+        FROM
+            smart_com_kj_action_record AS record
+            LEFT JOIN smart_com_muser AS muser ON record.comid = muser.comid
+            AND record.userid = muser.userid
+        WHERE
+            record.comid = #{comid}
+            AND record.empno = #{empno}
+            AND record.otype = '1'
+            AND record.btagcode = '9'
+            and muser.status = '0'
+        ORDER BY
+            record.begtime DESC
+    </select>
+
+    <!-- 张宁 点赞处理-->
+    <update id="updateDZ">
+      update smart_com_kj_custom_empship set
+      <if test='flag == "1"'>
+        praiseflag = '0'
+      </if>
+      <if test='flag == "2"'>
+        praiseflag = '1'
+      </if>
+      where comid = #{comid} and empno = #{empno} and userid = #{userid}
+    </update>
+</mapper>

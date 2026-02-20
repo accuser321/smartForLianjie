@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nh.smart.dao.material.SmartComKjLibwDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.nh.smart.entity.material.SmartComKjLibw">
+        <id column="comid" property="comid"/>
+        <result column="btagcode" property="btagcode"/>
+        <result column="sno" property="sno"/>
+        <result column="stitle" property="stitle"/>
+        <result column="smark" property="smark"/>
+        <result column="sdesc" property="sdesc"/>
+        <result column="pichttp" property="pichttp"/>
+        <result column="bpichttp" property="bpichttp"/>
+        <result column="conthttp" property="conthttp"/>
+        <result column="autor" property="autor"/>
+        <result column="readonly" property="readonly"/>
+        <result column="stagcode" property="stagcode"/>
+        <result column="indset" property="indset"/>
+        <result column="basttimes" property="basttimes"/>
+        <result column="fbtime" property="fbtime"/>
+        <result column="ydnum" property="ydnum"/>
+        <result column="sharenum" property="sharenum"/>
+        <result column="status" property="status"/>
+        <result column="operno" property="operno"/>
+        <result column="optime" property="optime"/>
+        <result column="pcnum" property="pcnum"/>
+    </resultMap>
+
+    <!-- 素材及标签结果映射 -->
+    <resultMap id="BqResultMap" type="com.nh.smart.entity.material.SmartComKjLibw">
+        <result column="stitle" property="stitle"/>
+        <result column="sdesc" property="sdesc"/>
+        <result column="pichttp" property="pichttp"/>
+        <result column="conthttp" property="conthttp"/>
+        <result column="basttimes" property="basttimes"/>
+        <collection property="bq" ofType="java.lang.String" javaType="java.util.List">
+            <result column="tagcode"/>
+        </collection>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="sql_columns">
+            comid, btagcode, sno, stitle, smark, sdesc, pichttp, bpichttp, conthttp, autor, readonly, stagcode, indset, basttimes, fbtime, ydnum, sharenum, status, operno, optime, pcnum
+    </sql>
+
+    <!-- 素材库素材列表查询 王名渤 -->
+    <select id="selectPageByBtagcode" resultType="com.nh.smart.entity.material.SmartComKjLibw">
+        select ackl.sno, ackl.pichttp, ackl.ydnum, ackl.btagcode
+        <if test='btagcode == "1"'>
+            ,ackl.stitle, ackl.sdesc, ackl.bpichttp
+        </if>
+
+        <if test='btagcode == "0"'>
+            ,ackl.stitle, ackl.bpichttp
+        </if>
+        from smart_com_kj_libw ackl
+        where ackl.comid = #{comid} and ackl.status = '0'
+        and unix_timestamp(now()) >= unix_timestamp(fbtime)
+        <if test='btagcode == "0"'>
+            and ackl.btagcode in('1')
+            <if test="dt != null and dt != ''">
+                and ackl.bpichttp is not null and ackl.bpichttp != ''
+            </if>
+        </if>
+        <if test='btagcode == "1"'>
+            and ackl.btagcode = '1'
+            <if test="dt != null and dt != ''">
+                and ackl.bpichttp is not null and ackl.bpichttp != ''
+            </if>
+        </if>
+
+        <if test="stitle != null and stitle != ''">
+            and ackl.stitle like concat ('%',#{stitle},'%')
+        </if>
+        <if test="stagcode != null and stagcode != ''">
+            and ackl.stagcode = #{stagcode}
+        </if>
+        order by ackl.btagcode asc, ackl.optime desc
+    </select>
+
+    <!-- 素材库素材详情 王名渤-->
+    <select id="selectOneBySno" resultMap="com.nh.smart.dao.material.SmartComKjLibwEmpnoDao.BqResultMap">
+        select ackl.sno
+        osno,ackl.stitle,ackl.smark,ackl.sdesc,ackl.conthttp,ackl.fbtime,ackl.ydnum,ackl.stagcode,ackl.pichttp,acklt.tagcode,ackl.readonly
+        from smart_com_kj_libw ackl
+        left join smart_com_kj_libw_tags acklt on ackl.comid = acklt.comid and ackl.sno = acklt.sno
+        where ackl.comid = #{comid} and ackl.sno = #{sno} and ackl.btagcode = #{btagcode} and ackl.status = '0'
+    </select>
+
+    <!-- 根据素材编号查询素材库的文章信息和素材标签信息 王名渤-->
+    <select id="selectWZInfoFromK" resultMap="BqResultMap">
+        select ackl.stitle, ackl.sdesc, ackl.pichttp, ackl.conthttp, ackl.basttimes,acklt.tagcode,ackl.stagcode,ackl.readonly
+        from smart_com_kj_libw ackl
+        left join smart_com_kj_libw_tags acklt on ackl.sno = acklt.sno and ackl.comid = acklt.comid
+        where ackl.comid = #{comid} and ackl.sno = #{sno} and ackl.status = '0' and ackl.btagcode = '1'
+    </select>
+
+    <!-- 更新文库素材的分享次数 王名渤-->
+    <update id="updateSharenum">
+        UPDATE smart_com_kj_libw set sharenum = sharenum+1 where comid = #{comid} and sno = #{osno}
+    </update>
+
+    <!-- 根据标签名称查询标签编码 王名渤-->
+    <select id="selectTagcodeByTagname" resultType="java.lang.String">
+        select tagcode from smart_com_kj_tagtype
+        where comid = #{comid} and uptagcode = #{uptagcode} and tagname = #{tagname}
+    </select>
+
+    <!-- 更新文库素材的阅读次数 王名渤 -->
+    <update id="updateYdnum">
+        UPDATE smart_com_kj_libw set ydnum = ydnum+1 where comid = #{comid} and sno = #{sno}
+    </update>
+
+    <!-- 张宁 获取素材标签-->
+    <select id="selectBQ" resultType="java.lang.String">
+        select tagcode from smart_com_kj_libw_tags where comid = #{comid} and sno = #{osno}
+    </select>
+
+    <!-- 张宁 根据文章编号查询文章详情-->
+    <select id="selectWzList" resultType="com.nh.smart.entity.material.SmartComKjLibwEmpno">
+        select *
+        from smart_com_kj_libw_empno
+        where comid = #{comid} and sno in (
+        <foreach collection="snolist" item="item" separator=",">
+            #{item}
+        </foreach>
+        )
+        and status = '0'
+    </select>
+
+
+
+  <!--查询分类及标签下拉框 王名渤-->
+  <select id="selectKJFL" resultType="java.util.Map">
+        select tagcode,tagname,iconhttp from smart_com_kj_tagtype where uptagcode = #{tagcode}
+        and comid = #{comid}
+        order by optime desc
+    </select>
+</mapper>

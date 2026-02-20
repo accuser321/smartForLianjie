@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nh.smart.dao.record.SmartComWxmsgDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.nh.smart.entity.record.SmartComWxmsg">
+        <id column="msgid" property="msgid"/>
+        <result column="comid" property="comid"/>
+        <result column="fuserid" property="fuserid"/>
+        <result column="tuserid" property="tuserid"/>
+        <result column="msgtype" property="msgtype"/>
+        <result column="btagcode" property="btagcode"/>
+        <result column="otype" property="otype"/>
+        <result column="sno" property="sno"/>
+        <result column="mtitle" property="mtitle"/>
+        <result column="mdesc" property="mdesc"/>
+        <result column="mcontent" property="mcontent"/>
+        <result column="mhttpurl" property="mhttpurl"/>
+        <result column="pushtime" property="pushtime"/>
+        <result column="readtime" property="readtime"/>
+        <result column="status" property="status"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="sql_columns">
+            comid, msgid, fuserid, tuserid, msgtype, btagcode, otype, sno, mtitle, mdesc, mcontent, mhttpurl, pushtime, readtime, status
+    </sql>
+
+    <!-- 张宁 查询业务员被咨询数-->
+    <select id="selectWxmsgByUserd" resultType="int">
+        select count(*) from smart_com_wxmsg
+        where comid= #{comid} and tuserid = #{tuserid} and fuserid != null and to_days(readtime) = to_days(now())
+    </select>
+
+    <!-- 张宁 查询消息列表-->
+    <select id="selectWxmsgPage" resultType="java.util.Map">
+        SELECT
+        CASE
+            WHEN
+                basemsg.NAME IS NULL
+                OR basemsg.NAME = '' THEN
+                    muser.nickname ELSE basemsg.NAME
+                END AS khname,
+                muser.headimg, chat.userid AS userid,
+                COUNT( CASE WHEN `readflag` = '0' AND type = '2'  THEN id ELSE NULL END ) AS unread,
+                SUBSTRING_INDEX( GROUP_CONCAT( intime, content ORDER BY intime DESC SEPARATOR '|*|*|-+|' ), '|*|*|-+|', 1 ) content
+            FROM
+                smart_com_kj_chat AS chat
+                LEFT JOIN smart_com_kj_custom_basemsg AS basemsg ON basemsg.comid = #{comid}
+                AND chat.userid = basemsg.userid
+                LEFT JOIN smart_com_muser AS muser ON muser.comid = #{comid}
+                AND muser.userid = chat.userid
+                AND muser.STATUS = '0'
+            WHERE
+                chat.empno = #{empno}
+                AND chat.comid = #{comid}
+            GROUP BY
+                userid
+        ORDER BY
+            content DESC
+    </select>
+
+    <!-- 张宁 统计咨询数-->
+    <select id="selectSumZX" resultType="java.util.Map">
+        select 'zxNUM' as type,  count(*) as num from smart_com_kj_action_record
+        where comid= #{comid} and suserid = #{ywUserid}  and empno = #{empno} and otype = '8' and userid != suserid
+    </select>
+
+    <!-- 张宁 添加更新咨询聊天记录-->
+    <insert id="insertKjChat">
+        insert into smart_com_kj_chat(id,comid, empno, userid, intime, content, readflag, type)
+        values( default, #{comid}, #{empno}, #{khuserid}, STR_TO_DATE(#{date},'%Y-%m-%d %H:%i:%s'), #{content}, #{read}, #{type})
+    </insert>
+
+    <!-- 张宁 查询历史消息-->
+    <select id="getKjChat" resultType="java.util.Map">
+        select id, content, readflag, empno, userid, intime, type from smart_com_kj_chat where comid = #{comid} and empno = #{empno} and userid = #{khuserid} and
+        <if test="type != null" >
+            type = #{type}
+        </if>
+        and readflag = '0'
+        order by intime desc
+    </select>
+
+    <!-- 张宁 更新消息状态-->
+    <update id="updateRead">
+        update smart_com_kj_chat set readflag = '1' where comid = #{comid} and empno = #{empno} and userid = #{userid}
+    </update>
+
+    <!-- 张宁 修改消息状态-->
+    <update id="updateMSG">
+        update smart_com_kj_chat set readflag = '1' where comid = #{comid} and empno = #{empno} and userid = #{userid} and type = #{type} and readflag = '0'
+    </update>
+
+    <!-- 查询消息记录 -->
+    <select id="QueryMessage" resultType="com.nh.smart.entity.record.SmartComWxmsg">
+        SELECT msgid,mtitle,mdesc,mhttpurl,pushtime,status
+        FROM smart_com_wxmsg  WHERE comid=#{comid} AND tuserid=#{userid}
+        <if test="msgtype != null and msgtype != ''">
+            and msgtype=#{btagcode}
+        </if>
+        <if test="btagcode != null and btagcode != ''">
+            and btagcode=#{btagcode}
+        </if>
+        <if test="otype != null and otype != ''">
+            and otype=#{otype}
+        </if>
+        order by pushtime desc
+    </select>
+
+    <!-- 查询消息状态 -->
+    <select id="findStatus" resultType="java.lang.String">
+        SELECT status
+        from smart_com_wxmsg where comid=#{comid}  and msgid=#{msgid}
+    </select>
+
+    <!-- 修改消息状态 -->
+    <update id="updateStatus">
+        update smart_com_wxmsg
+        set status=#{status} ,readtime=now()
+        where comid=#{comid}  and msgid=#{msgid}
+    </update>
+
+    <!-- 查询消息中心未读条数 王名渤 -->
+    <select id="selectCountWDMessage" resultType="java.lang.Integer">
+        select count(*) from smart_com_wxmsg where tuserid = #{userid} and comid = #{comid} and status = '0'
+    </select>
+</mapper>

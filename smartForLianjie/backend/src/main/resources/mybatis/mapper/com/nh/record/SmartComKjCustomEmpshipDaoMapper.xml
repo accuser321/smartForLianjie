@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nh.smart.dao.record.SmartKjCustomEmpshipDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.nh.smart.entity.record.SmartKjCustomEmpship">
+        <id column="comid" property="comid"/>
+        <result column="empno" property="empno"/>
+        <result column="userid" property="userid"/>
+        <result column="tsflag" property="tsflag"/>
+        <result column="flushtime" property="flushtime"/>
+        <result column="abdflag" property="abdflag"/>
+        <result column="nbsflag" property="nbsflag"/>
+        <result column="intime" property="intime"/>
+        <result column="fromsctype" property="fromsctype"/>
+        <result column="fromsno" property="fromsno"/>
+        <result column="zkhflag" property="zkhflag"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="sql_columns">
+            comid, empno, userid, tsflag, flushtime, abdflag, nbsflag, intime, fromsctype, fromsno, zkhflag
+    </sql>
+
+    <!-- 张宁 添加客户与业务员关系-->
+    <insert id="insertCustomEmpship">
+        insert into smart_com_kj_custom_empship(empno, userid, tsflag, flushtime, abdflag, nbsflag, intime,
+        fromsctype, fromsno, zkhflag, comid)
+        values(
+        <if test="smartKjCustomEmpship.empno != null and smartKjCustomEmpship.empno != ''">
+            #{smartKjCustomEmpship.empno},
+        </if>
+        <if test='smartKjCustomEmpship.empno == null or smartKjCustomEmpship.empno == ""'>
+            null,
+        </if>
+        <if test="smartKjCustomEmpship.userid != null and smartKjCustomEmpship.userid != ''">
+            #{smartKjCustomEmpship.userid},
+        </if>
+        <if test='smartKjCustomEmpship.userid == null or smartKjCustomEmpship.userid == ""'>
+            null,
+        </if>
+        <if test="smartKjCustomEmpship.tsflag != null and smartKjCustomEmpship.tsflag != ''">
+            #{smartKjCustomEmpship.tsflag},
+        </if>
+        <if test='smartKjCustomEmpship.tsflag == null or smartKjCustomEmpship.tsflag == ""'>
+            null,
+        </if>
+        <if test="smartKjCustomEmpship.flushtime != null">
+            #{smartKjCustomEmpship.flushtime},
+        </if>
+        <if test='smartKjCustomEmpship.flushtime == null'>
+            null,
+        </if>
+        <if test="smartKjCustomEmpship.abdflag != null and smartKjCustomEmpship.abdflag != ''">
+            #{smartKjCustomEmpship.abdflag},
+        </if>
+        <if test='smartKjCustomEmpship.abdflag == null or smartKjCustomEmpship.abdflag == ""'>
+            null,
+        </if>
+        <if test="smartKjCustomEmpship.nbsflag != null and smartKjCustomEmpship.nbsflag != ''">
+            #{smartKjCustomEmpship.nbsflag},
+        </if>
+        <if test='smartKjCustomEmpship.nbsflag == null or smartKjCustomEmpship.nbsflag == ""'>
+            null,
+        </if>
+        <if test="smartKjCustomEmpship.intime != null">
+            #{smartKjCustomEmpship.intime},
+        </if>
+        <if test="smartKjCustomEmpship.intime == null">
+            null,
+        </if>
+        <if test="smartKjCustomEmpship.fromsctype != null and smartKjCustomEmpship.fromsctype != ''">
+            #{smartKjCustomEmpship.fromsctype},
+        </if>
+        <if test='smartKjCustomEmpship.fromsctype == null or smartKjCustomEmpship.fromsctype == ""'>
+            null,
+        </if>
+        <if test="smartKjCustomEmpship.fromsno != null and smartKjCustomEmpship.fromsno != ''">
+            #{smartKjCustomEmpship.fromsno},
+        </if>
+        <if test='smartKjCustomEmpship.fromsno == null or smartKjCustomEmpship.fromsno == ""'>
+            null,
+        </if>
+        <if test="smartKjCustomEmpship.zkhflag != null and smartKjCustomEmpship.zkhflag != ''">
+            #{smartKjCustomEmpship.zkhflag},
+        </if>
+        <if test='smartKjCustomEmpship.zkhflag == null or smartKjCustomEmpship.zkhflag == ""'>
+            null,
+        </if>
+        #{smartKjCustomEmpship.comid}
+        )
+        on duplicate key update flushtime = now()
+        <if test='smartKjCustomEmpship.tsflag == "1"'>
+            , tsflag = #{smartKjCustomEmpship.tsflag}
+        </if>
+    </insert>
+
+    <!-- 张宁 查看业务员拓客数-->
+    <select id="selectCustomEmpship" resultType="int">
+        select count(*) from smart_com_kj_custom_empship
+        where
+        comid = #{comid} and empno = #{empno} and to_days(intime) = to_days(now())
+    </select>
+
+</mapper>

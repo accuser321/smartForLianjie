@@ -1,0 +1,26 @@
+---
+spring:       #表示该配置直接为spring容器负责处理
+  messages:   #表示进行资源配置
+    basename: i18n/Messages,i18n/Pages    #资源文件的名称
+  profiles: test
+
+
+server:
+  port: 5106  #此处设置的服务端口配置
+  servlet:
+    context-path: /smart #项目访问前缀
+
+---
+spring:
+  redis:
+    host: 54.223.26.213
+    port: 6379
+    password: NHRedis2019@@Team
+    timeout: 1000     # 连接超时时间（毫秒）
+    database: 0       # Redis数据库索引（默认为0）
+    jedis:
+      pool:
+        max-active: 10 # 连接池最大连接数（使用负值表示没有限制）
+        max-idle: 8   # 连接池中的最大空闲连接
+        min-idle: 2   # 连接池中的最小空闲连接
+        max-wait: 100 # 连接池最大阻塞等待时间（使用负值表示没有限制）

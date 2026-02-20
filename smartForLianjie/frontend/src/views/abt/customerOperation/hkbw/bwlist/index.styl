@@ -1,0 +1,192 @@
+.acontent {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+}
+.nodata
+  padding-top 30%
+  text-align center
+  .kongimg
+    width: 300px;
+    height auto
+.mywz
+  bottom 3.1rem
+.tabcss
+  color: color-primary !important;
+  border-bottom: 1px solid color-primary;
+.article-type-container {
+  position: relative;
+  height: 130px;
+  .article-type {
+    background: #fcfcfc;
+    overflow: auto;
+    position: relative;
+    -webkit-overflow-scrolling: touch;
+    height: 130px;
+    margin-right:90px;
+    border-bottom: 1px solid #f0f0f0;
+        .type-lists {
+            font-size:0.4rem;
+            display: flex;
+            width: auto;
+            white-space: nowrap;
+            li {
+                padding: 35px 50px 25px;
+                font-size: 0.4rem;
+                background-color: white;
+                font-weight: 900;
+            }
+        }
+    }
+    .fdj {
+        width: 130px;
+        position: absolute;
+        top: 0;
+        right: 0;
+        height:130px;
+        background-image: url(../../../../../assets/abt/img/searchwz.png);
+        background-repeat: no-repeat;
+        background-size: auto 35%;
+        background-position: center;
+        background-color: white;
+        border-bottom: 1px solid #f0f0f0;
+    }
+}
+.wzcontent{
+  padding-bottom 60px
+  .ali {
+    position: relative;
+    border-bottom: 1px #efefef solid;
+    .card {
+      background: #fff;
+      font-size: 0.7rem;
+      display: flex;
+      padding: 30px 2% 30px;
+      position: relative;
+      .item-media {
+        position: relative;
+        width: 33%;
+        .imgbox {
+          width: 100%;
+          height: 100%;
+          .img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            border-radius:25px;
+            background-size: cover;
+            background-position: center;
+          }
+        }
+      }
+      .item-inner {
+        margin-left:30px;
+        width: 60%;
+        .Title {
+          font-size: 42px;
+          text-align: left;
+          height:130px;
+          line-height: 60px;
+        }
+        .desc {
+          color: #777777;
+          font-size: 35px;
+          overflow: hidden; /*超出部分隐藏*/
+          white-space: nowrap; /*不换行*/
+          text-overflow: ellipsis; /*超出部分文字以...显示*/
+          line-height 60px
+        }
+      }
+    }
+  }
+}
+#searchPage {
+  font-size: 0.4rem;
+  background-color: #dedede;
+  position: absolute;
+  top: 0px;
+  z-index: 999;
+  width: 100%;
+  height: 100%;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  /deep/.md-popup-box{
+    width 100%;
+    height 100%;
+  }
+  /deep/ .md-popup-mask{
+    background-color: white
+  }
+  .search {
+    width: 75%;
+    height: 1.1rem;
+    line-height: 1.1rem;
+    //background: url("../../../../../assets/abt/img/fdj.png")
+    background-size: .55rem;
+    border-radius: 0.3rem;
+    background-repeat: no-repeat;
+    display: inline-block;
+    background-color: white;
+    background-position:.3rem;
+    input {
+      width: 80%;
+      margin-left: 15%;
+      height: 1.1rem;
+      line-height: 1.1rem;
+      font-size: 0.4rem;
+    }
+  }
+  .searchbox {
+    padding: 0.2rem 0.5rem;
+    background: #f0f0f0;
+    height: 1.5rem;
+    .md-icon.icon-font.lg{
+      font-size 0.6rem;
+      color #B1B1B1
+    }
+    .closeicon{
+      display: inline-block;
+      i{
+        position: relative;
+        top:0.1rem
+      }
+    }
+    .cancel {
+      font-size: 0.4rem;
+      text-align: center;
+      display inline-block;
+      width: 16%;
+      height: 1.1rem;
+      line-height: 1.1rem;
+    }
+    .searchstart {
+      height: 2rem;
+      line-height: 2rem;
+      font-size: 0.8rem;
+      color: color-primary !important;
+    }
+    .img {
+      width: 15%;
+      height: 2rem;
+      text-align: left;
+      img {
+        border-radius: 50%;
+      }
+    }
+  }
+}
+.tabbar{
+  /deep/ .scroll-view-container{
+    margin-top .1rem
+  }
+  /deep/ .md-tab-bar-item{
+    font-size .4rem
+    padding: 0 0.3rem;
+    font-weight 600
+    color #000
+  }
+}
