@@ -42,3 +42,15 @@
 
 ## 8. 当前阶段目标
 - 按 V2 白名单继续把关键链路从“占位接口”升级成“真实业务实现”。
+
+## 9. 最新进展（2026-02-20 晚）
+- 已补齐 `wholookme` 与 `aiana` 页面依赖的核心分析接口返回结构，页面可在“无真实库数据”模式下正常渲染：
+  - `getAIAnalysis`
+  - `selectTimeKHByEmpno`
+  - `selectKHByOtype`
+  - `getRecordAnalyze`
+  - `getRecordKH`
+  - `getRecordRD`
+  - `getYSLD`
+- 当前这些接口为“结构化模拟数据”；后续按你确认的功能优先级替换成真实 SQL。
+- 编译现状：JDK8 环境可用，但当前网络 DNS 无法访问 Maven 中央仓库，`mvn compile` 暂不可完成。

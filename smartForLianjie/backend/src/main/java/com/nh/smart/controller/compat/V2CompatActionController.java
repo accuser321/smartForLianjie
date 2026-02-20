@@ -13,6 +13,9 @@ import com.nh.smart.util.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @RestController
@@ -236,73 +239,118 @@ public class V2CompatActionController {
 
     @GetMapping("/getAIAnalysis/{userid}")
     public Result getAIAnalysisByPath(@PathVariable String userid) {
-        return Result.successJson(buildAIAnalysis());
+        return Result.successJson(buildAIAnalysis(userid));
     }
 
     @GetMapping("/getAIAnalysis")
     public Result getAIAnalysisByParam(@RequestParam(required = false) String userid) {
-        return Result.successJson(buildAIAnalysis());
+        return Result.successJson(buildAIAnalysis(userid));
     }
 
-    private JSONObject buildAIAnalysis() {
+    private JSONObject buildAIAnalysis(String userid) {
+        int seed = Math.abs((userid == null ? String.valueOf(safeUserid()) : userid).hashCode());
         JSONObject json = new JSONObject();
-        json.put("activeList", new ArrayList<>());
-        json.put("demandList", new ArrayList<>());
-        json.put("interactive", new ArrayList<>());
-        json.put("interest", new ArrayList<>());
+        json.put("activeList", buildTrendRows(15, 2 + seed % 3, 3 + seed % 4));
+        json.put("demandList", Arrays.asList(
+            rowKV("tagname", "保险配置", "num", 20 + seed % 15),
+            rowKV("tagname", "理财增值", "num", 15 + seed % 10),
+            rowKV("tagname", "养老规划", "num", 10 + seed % 8),
+            rowKV("tagname", "子女教育", "num", 8 + seed % 7)
+        ));
+        json.put("interactive", Arrays.asList(
+            rowKV("type", "查看名片", "num", 18 + seed % 10),
+            rowKV("type", "阅读文章", "num", 22 + seed % 12),
+            rowKV("type", "咨询互动", "num", 9 + seed % 6),
+            rowKV("type", "点赞转发", "num", 12 + seed % 7)
+        ));
+        json.put("interest", Arrays.asList(
+            rowKV("type", "健康保障", "num", 28 + seed % 10),
+            rowKV("type", "高端医疗", "num", 16 + seed % 9),
+            rowKV("type", "年金养老", "num", 14 + seed % 7),
+            rowKV("type", "资产配置", "num", 11 + seed % 6)
+        ));
         return json;
     }
 
     @PostMapping("/selectTimeKHByEmpno")
     public Result selectTimeKHByEmpno(@RequestBody Map<String, Object> map) {
-        return Result.successJson(emptyPageRowsMap());
+        return Result.successJson(buildBehaviorPage(map, null));
     }
 
     @PostMapping("/selectKHByOtype")
     public Result selectKHByOtype(@RequestBody Map<String, Object> map) {
-        return Result.successJson(emptyPageRowsMap());
+        List<String> tags = parseTags(String.valueOf(map.getOrDefault("btagcode", "")));
+        if (tags.isEmpty()) {
+            tags = Arrays.asList("9", "10", "12", "7");
+        }
+        return Result.successJson(buildBehaviorPage(map, tags));
     }
 
     @GetMapping("/getRecordAnalyze")
     public Result getRecordAnalyze() {
         JSONObject json = new JSONObject();
-        json.put("numList", new ArrayList<>());
-        json.put("activeList", new ArrayList<>());
-        json.put("khInteractive", new ArrayList<>());
+        int seed = Math.max(1, safeUserid());
+        json.put("numList", rowKV(
+            "kuNUM", 120 + seed % 30,
+            "mpDZ", 80 + seed % 20,
+            "mpZF", 26 + seed % 10,
+            "wzRD", 340 + seed % 90,
+            "wzZF", 42 + seed % 15,
+            "zxNUM", 18 + seed % 8
+        ));
+        json.put("activeList", buildTrendRows(15, 4 + seed % 3, 4 + seed % 2));
+        json.put("khInteractive", Arrays.asList(
+            rowKV("type", "名片互动", "num", 32 + seed % 10),
+            rowKV("type", "文章互动", "num", 46 + seed % 12),
+            rowKV("type", "咨询互动", "num", 21 + seed % 8),
+            rowKV("type", "活动互动", "num", 13 + seed % 6)
+        ));
         return Result.successJson(json);
     }
 
     @GetMapping("/getRecordKH/{KHday}")
     public Result getRecordKHByPath(@PathVariable String KHday) {
-        JSONObject json = new JSONObject();
-        json.put("hkDaynum", new ArrayList<>());
-        return Result.successJson(json);
+        return buildRecordKHResult(KHday);
     }
 
     @GetMapping("/getRecordKH")
     public Result getRecordKHByParam(@RequestParam(required = false) String KHday) {
-        JSONObject json = new JSONObject();
-        json.put("hkDaynum", new ArrayList<>());
-        return Result.successJson(json);
+        return buildRecordKHResult(KHday);
     }
 
     @GetMapping("/getRecordRD/{Readday}")
     public Result getRecordRDByPath(@PathVariable String Readday) {
-        JSONObject json = new JSONObject();
-        json.put("rdDaynum", new ArrayList<>());
-        return Result.successJson(json);
+        return buildRecordRDResult(Readday);
     }
 
     @GetMapping("/getRecordRD")
     public Result getRecordRDByParam(@RequestParam(required = false) String Readday) {
+        return buildRecordRDResult(Readday);
+    }
+
+    private Result buildRecordRDResult(String readDay) {
+        int days = parseDayCount(readDay);
         JSONObject json = new JSONObject();
-        json.put("rdDaynum", new ArrayList<>());
+        json.put("rdDaynum", buildTrendRows(days, 6, 5));
+        return Result.successJson(json);
+    }
+
+    private Result buildRecordKHResult(String khDay) {
+        int days = parseDayCount(khDay);
+        JSONObject json = new JSONObject();
+        json.put("hkDaynum", buildTrendRows(days, 2, 4));
         return Result.successJson(json);
     }
 
     @GetMapping("/getYSLD")
     public Result getYSLD() {
-        return Result.successJson(new ArrayList<>());
+        List<Map<String, Object>> rows = Arrays.asList(
+            rowKV("type", "潜在客户", "num", 168),
+            rowKV("type", "重点跟进", "num", 92),
+            rowKV("type", "高意向", "num", 47),
+            rowKV("type", "成交转化", "num", 21)
+        );
+        return Result.successJson(rows);
     }
 
     @PostMapping("/selectMessage")
@@ -421,5 +469,101 @@ public class V2CompatActionController {
         json.put("looknum", 0);
         json.put("zxnum", 0);
         return Result.successJson(json);
+    }
+
+    private int parseDayCount(String dayText) {
+        try {
+            int days = Integer.parseInt(String.valueOf(dayText));
+            if (days <= 0) {
+                return 7;
+            }
+            return Math.min(days, 30);
+        } catch (Exception e) {
+            return 7;
+        }
+    }
+
+    private List<Map<String, Object>> buildTrendRows(int days, int minBase, int floatRange) {
+        List<Map<String, Object>> rows = new ArrayList<>();
+        LocalDate today = LocalDate.now();
+        for (int i = days - 1; i >= 0; i--) {
+            int index = days - 1 - i;
+            rows.add(rowKV(
+                "time", today.minusDays(i).format(DateTimeFormatter.ofPattern("MM-dd")),
+                "num", minBase + (index % 5) * floatRange + (index / 3)
+            ));
+        }
+        return rows;
+    }
+
+    private JSONObject buildBehaviorPage(Map<String, Object> map, List<String> forceTags) {
+        long page = parsePageNum(map.get("page"), 1L);
+        long size = parsePageNum(map.get("size"), 10L);
+        long total = 48L;
+        long offset = (page - 1) * size;
+        List<String> tagPool = forceTags == null || forceTags.isEmpty()
+            ? Arrays.asList("9", "10", "12", "7", "11", "13", "14", "15", "17")
+            : forceTags;
+        Map<String, List<Map<String, Object>>> rows = new LinkedHashMap<>();
+        DateTimeFormatter timeFmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        for (int i = 0; i < size; i++) {
+            long idx = offset + i;
+            if (idx >= total) {
+                break;
+            }
+            LocalDate day = LocalDate.now().minusDays((int) (idx / 4));
+            LocalDateTime time = day.atTime(9 + (int) (idx % 8), 10 + (int) (idx % 40), 0);
+            String btagcode = tagPool.get((int) (idx % tagPool.size()));
+            Map<String, Object> item = rowKV(
+                "userid", 10001 + idx,
+                "khname", "客户" + (idx + 1),
+                "headimg", "",
+                "btagcode", btagcode,
+                "stitle", "内容" + (idx + 1),
+                "remark", "方案" + (idx + 1),
+                "begtime", time.format(timeFmt),
+                "basttime", (2 + idx % 4) + "分" + (idx % 2 == 0 ? "00" : "30") + "秒",
+                "acttime", (idx % 5 == 0 ? "00:00" : String.format(Locale.ROOT, "0%d:%02d", 1 + idx % 3, 10 + idx % 40))
+            );
+            String dayKey = day.format(DateTimeFormatter.ISO_LOCAL_DATE);
+            rows.computeIfAbsent(dayKey, k -> new ArrayList<>()).add(item);
+        }
+        JSONObject json = new JSONObject();
+        json.put("rows", rows);
+        json.put("total", total);
+        json.put("totalpage", (total + size - 1) / size);
+        return json;
+    }
+
+    private List<String> parseTags(String text) {
+        if (text == null || text.trim().isEmpty()) {
+            return Collections.emptyList();
+        }
+        String[] arr = text.split(",");
+        List<String> tags = new ArrayList<>();
+        for (String s : arr) {
+            String v = s.trim();
+            if (!v.isEmpty()) {
+                tags.add(v);
+            }
+        }
+        return tags;
+    }
+
+    private long parsePageNum(Object value, long defaultValue) {
+        try {
+            long v = Long.parseLong(String.valueOf(value));
+            return Math.max(1L, v);
+        } catch (Exception e) {
+            return defaultValue;
+        }
+    }
+
+    private Map<String, Object> rowKV(Object... values) {
+        Map<String, Object> map = new LinkedHashMap<>();
+        for (int i = 0; i + 1 < values.length; i += 2) {
+            map.put(String.valueOf(values[i]), values[i + 1]);
+        }
+        return map;
     }
 }
