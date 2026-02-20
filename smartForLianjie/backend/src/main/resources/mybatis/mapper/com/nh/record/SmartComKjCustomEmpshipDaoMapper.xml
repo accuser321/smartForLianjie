@@ -102,4 +102,58 @@
         comid = #{comid} and empno = #{empno} and to_days(intime) = to_days(now())
     </select>
 
+    <select id="selectCustomPage" resultType="java.util.Map">
+        SELECT
+            rel.userid AS userid,
+            IFNULL(NULLIF(base.name, ''), IFNULL(mu.nickname, '')) AS khname,
+            IFNULL(mu.headimg, '') AS headimg,
+            IFNULL(NULLIF(base.mobile, ''), IFNULL(mu.mobile, '')) AS phone,
+            DATE_FORMAT(rel.intime, '%Y-%m-%d %H:%i') AS intime,
+            DATE_FORMAT(rel.flushtime, '%Y-%m-%d %H:%i') AS flushtime,
+            IFNULL(emp.empname, '') AS ywname
+        FROM smart_com_kj_custom_empship rel
+        LEFT JOIN smart_com_kj_custom_basemsg base
+            ON base.comid = rel.comid AND base.empno = rel.empno AND base.userid = rel.userid
+        LEFT JOIN smart_com_muser mu
+            ON mu.comid = rel.comid AND mu.userid = rel.userid AND mu.status = '0'
+        LEFT JOIN smart_com_empno emp
+            ON emp.comid = rel.comid AND emp.empno = rel.empno
+        <where>
+            rel.comid = #{comid}
+            AND rel.empno = #{empno}
+            <if test="name != null and name != ''">
+                AND (base.name LIKE CONCAT('%', #{name}, '%') OR mu.nickname LIKE CONCAT('%', #{name}, '%'))
+            </if>
+            <if test="mode == 'address'">
+                AND IFNULL(rel.tsflag, '0') != '1'
+            </if>
+            <if test="mode == 'recent'">
+                AND IFNULL(rel.tsflag, '0') != '1'
+            </if>
+            <if test="mode == 'prospect'">
+                AND rel.zkhflag = '1'
+            </if>
+            <if test="mode == 'colleague'">
+                AND rel.tsflag = '1'
+            </if>
+            <if test="labids != null and labids.size() > 0">
+                AND EXISTS (
+                    SELECT 1 FROM smart_com_kj_empno_label lbl
+                    WHERE lbl.comid = rel.comid
+                      AND lbl.empno = rel.empno
+                      AND lbl.userid = rel.userid
+                      AND lbl.labid IN
+                      <foreach collection="labids" item="labid" open="(" separator="," close=")">
+                          #{labid}
+                      </foreach>
+                )
+            </if>
+        </where>
+        ORDER BY
+            <choose>
+                <when test="mode == 'recent'">rel.flushtime DESC</when>
+                <otherwise>rel.intime DESC</otherwise>
+            </choose>
+    </select>
+
 </mapper>

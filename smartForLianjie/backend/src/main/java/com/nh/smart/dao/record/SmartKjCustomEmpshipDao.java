@@ -1,6 +1,8 @@
 package com.nh.smart.dao.record;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.nh.smart.entity.record.SmartKjCustomEmpship;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -33,4 +35,14 @@ public interface SmartKjCustomEmpshipDao extends BaseMapper<SmartKjCustomEmpship
      * @Date: 2019/11/6
      */
     int selectCustomEmpship(@Param("comid") String comid, @Param("empno") String empno);
+
+    /**
+     * 客户挖掘列表（通讯录/最近访客/准客户/朋友）
+     */
+    IPage<Map<String, Object>> selectCustomPage(Page page,
+                                                @Param("comid") String comid,
+                                                @Param("empno") String empno,
+                                                @Param("name") String name,
+                                                @Param("labids") List<String> labids,
+                                                @Param("mode") String mode);
 }

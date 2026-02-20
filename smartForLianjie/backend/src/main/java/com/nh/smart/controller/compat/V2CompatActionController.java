@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.nh.smart.annotation.MultiRequestBody;
 import com.nh.smart.dao.record.SmartComWxmsgDao;
+import com.nh.smart.dao.record.SmartKjCustomEmpshipDao;
 import com.nh.smart.entity.base.Result;
 import com.nh.smart.entity.record.SmartComWxmsg;
 import com.nh.smart.util.JwtTokenUtil;
@@ -19,6 +20,8 @@ public class V2CompatActionController {
 
     @Autowired
     private SmartComWxmsgDao smartComWxmsgDao;
+    @Autowired
+    private SmartKjCustomEmpshipDao smartKjCustomEmpshipDao;
 
     private String safeComid() {
         try {
@@ -60,24 +63,77 @@ public class V2CompatActionController {
         return json;
     }
 
+    private List<String> parseLabids(Object labidObj) {
+        if (labidObj == null) {
+            return Collections.emptyList();
+        }
+        if (labidObj instanceof List) {
+            List<?> raw = (List<?>) labidObj;
+            List<String> ids = new ArrayList<>();
+            for (Object item : raw) {
+                if (item != null && !String.valueOf(item).trim().isEmpty()) {
+                    ids.add(String.valueOf(item).trim());
+                }
+            }
+            return ids;
+        }
+        String text = String.valueOf(labidObj).trim();
+        if (text.isEmpty()) {
+            return Collections.emptyList();
+        }
+        if (text.startsWith("[") && text.endsWith("]")) {
+            text = text.substring(1, text.length() - 1);
+        }
+        String[] arr = text.split(",");
+        List<String> ids = new ArrayList<>();
+        for (String s : arr) {
+            String v = s.replace("\"", "").replace("'", "").trim();
+            if (!v.isEmpty()) {
+                ids.add(v);
+            }
+        }
+        return ids;
+    }
+
+    private Result selectCustomByMode(Map<String, Object> map, String mode) {
+        try {
+            String comid = safeComid();
+            String empno = safeEmpno();
+            long page = Long.parseLong(String.valueOf(map.getOrDefault("page", "1")));
+            long size = Long.parseLong(String.valueOf(map.getOrDefault("size", "10")));
+            String name = String.valueOf(map.getOrDefault("name", ""));
+            List<String> labids = parseLabids(map.get("labid"));
+            IPage<Map<String, Object>> data = smartKjCustomEmpshipDao.selectCustomPage(
+                new Page<>(page, size), comid, empno, name, labids, mode
+            );
+            JSONObject json = new JSONObject();
+            json.put("rows", data.getRecords());
+            json.put("total", data.getTotal());
+            json.put("totalpage", data.getPages());
+            return Result.successJson(json);
+        } catch (Exception e) {
+            return Result.successJson(emptyPageRowsArray());
+        }
+    }
+
     @PostMapping("/getCommunicationKH")
     public Result getCommunicationKH(@RequestBody Map<String, Object> map) {
-        return Result.successJson(emptyPageRowsArray());
+        return selectCustomByMode(map, "address");
     }
 
     @PostMapping("/getRecentlyKH")
     public Result getRecentlyKH(@RequestBody Map<String, Object> map) {
-        return Result.successJson(emptyPageRowsArray());
+        return selectCustomByMode(map, "recent");
     }
 
     @PostMapping("/getStandardKH")
     public Result getStandardKH(@RequestBody Map<String, Object> map) {
-        return Result.successJson(emptyPageRowsArray());
+        return selectCustomByMode(map, "prospect");
     }
 
     @PostMapping("/getColleague")
     public Result getColleague(@RequestBody Map<String, Object> map) {
-        return Result.successJson(emptyPageRowsArray());
+        return selectCustomByMode(map, "colleague");
     }
 
     @PostMapping("/getKHContacts")
