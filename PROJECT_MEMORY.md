@@ -54,3 +54,11 @@
   - `getYSLD`
 - 当前这些接口为“结构化模拟数据”；后续按你确认的功能优先级替换成真实 SQL。
 - 编译现状：JDK8 环境可用，但当前网络 DNS 无法访问 Maven 中央仓库，`mvn compile` 暂不可完成。
+
+## 10. 最新进展（2026-02-20 夜）
+- 已继续补“消息/提醒”链路，重点处理前端直接使用字段导致的结构风险：
+  - `V2CompatAlertmsgController`：`selectByPage/checkDetails/statistics` 已改为可渲染结构；
+  - `V2CompatComplainController`：`complainlist` 改为返回数组；
+  - `V2CompatCouponController`：`grantCoupon` 改为返回数组；
+  - `V2CompatUserCardController`：`getTXRecord/getTXRecords` 已补齐提现页面依赖字段（含 `blankmessage`）。
+- 当前策略保持不变：先保证“页面不报错 + 可联调”，再逐条替换为真实业务查询。

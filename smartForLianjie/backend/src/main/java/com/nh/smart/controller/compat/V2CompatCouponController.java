@@ -22,7 +22,7 @@ public class V2CompatCouponController {
 
     @GetMapping("/grantCoupon")
     public Result grantCoupon(@RequestParam Map<String, String> params) {
-        return Result.successJson();
+        return Result.successJson(new ArrayList<>());
     }
 
     @GetMapping("/useFWCoupon")
@@ -30,4 +30,3 @@ public class V2CompatCouponController {
         return Result.successJson(new LinkedHashMap<String, Object>());
     }
 }
-
