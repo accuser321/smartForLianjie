@@ -101,3 +101,10 @@
   - 个人资料：`updatePersonalData` 已支持保存后回显一致（内存态）；
   - 咨询消息：`insertKjChat/getLS` 已形成会话级模拟历史闭环；
   - 首页角标：`selectPush/selectKFMsgList/selectWDKFMsg` 已形成读未读联动。
+
+## 17. 最新进展（2026-02-21 凌晨 4）
+- 按用户确认继续完成 1/2/3：
+  - 登录初始化兜底：`getWxInfo/getUerInfo` 增加兼容返回；
+  - 素材库链路兜底：`selectPage/selectOneBySno/importWZ/insertWZ/updateWZ/updateBq` 等接口在服务不可用时不阻断流程；
+  - 行为与消息页兜底：`getWZRdZf/selectMessage/QueryMessage` 返回可渲染分页结构。
+- 用户强调执行策略：以“功能先完成、尽快上线”为主，优化后置讨论。

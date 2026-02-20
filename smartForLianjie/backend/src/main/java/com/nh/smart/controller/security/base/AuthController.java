@@ -21,6 +21,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -326,7 +328,18 @@ public class AuthController {
         PrintWriter out = null;
         try {
             out = response.getWriter();
-            out.append(authService.getWxInfo(comid).toJSONString());
+            try {
+                out.append(authService.getWxInfo(comid).toJSONString());
+            } catch (Exception ex) {
+                JSONObject fallback = new JSONObject();
+                fallback.put("appid", "");
+                fallback.put("scope", "snsapi_userinfo");
+                fallback.put("ossurl", "");
+                fallback.put("msossurl", "");
+                fallback.put("comname", "演示机构");
+                fallback.put("stylenum", "1");
+                out.append(fallback.toJSONString());
+            }
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -443,9 +456,21 @@ public class AuthController {
     @GetMapping("/getUerInfo")
     @ApiOperation(value = "获取当前用户信息")
     public Result getUerInfo() throws Exception {
-        JSONObject result = authService.getUerInfo();
-        Map pictureList=smartComKjLibwService.pictureList();
-        result.put("smartComModelsMobileImgs",pictureList);
-        return Result.successJson(result, "获取openid成功");
+        try {
+            JSONObject result = authService.getUerInfo();
+            Map pictureList = smartComKjLibwService.pictureList();
+            result.put("smartComModelsMobileImgs", pictureList);
+            return Result.successJson(result, "获取openid成功");
+        } catch (Exception e) {
+            JSONObject result = new JSONObject();
+            result.put("menulist", new ArrayList<>());
+            result.put("ossurl", "");
+            result.put("msossurl", "");
+            result.put("comname", "演示机构");
+            result.put("banner", new ArrayList<>());
+            result.put("bar", new ArrayList<>());
+            result.put("smartComModelsMobileImgs", new LinkedHashMap<String, Object>());
+            return Result.successJson(result, "兼容返回");
+        }
     }
 }
