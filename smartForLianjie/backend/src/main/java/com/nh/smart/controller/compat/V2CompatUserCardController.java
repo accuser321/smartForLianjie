@@ -50,9 +50,15 @@ public class V2CompatUserCardController {
     @GetMapping("/getPersonalData")
     public Result getPersonalData(@RequestParam Map<String, String> params) {
         Map<String, Object> data = new LinkedHashMap<>();
+        data.put("comname", "演示机构");
+        data.put("empname", "演示顾问");
+        data.put("phone", "13800000000");
         data.put("sex", "1");
         data.put("email", "");
-        data.put("address", "");
+        data.put("zaddr", "");
+        data.put("degreename", "");
+        data.put("wxnumber", "");
+        data.put("pdesc", "");
         data.put("remark", "");
         return Result.successJson(data);
     }
@@ -96,7 +102,11 @@ public class V2CompatUserCardController {
 
     @GetMapping("/getZYZMessage")
     public Result getZYZMessage(@RequestParam Map<String, String> params) {
-        return Result.successJson(new LinkedHashMap<String, Object>());
+        Map<String, Object> data = new LinkedHashMap<>();
+        data.put("certno", "ZYZ000000");
+        data.put("begdate", "2026-01-01");
+        data.put("enddate", "2028-12-31");
+        return Result.successJson(data);
     }
 
     @GetMapping("/isShowPromotionprice")
@@ -108,7 +118,13 @@ public class V2CompatUserCardController {
 
     @GetMapping("/getSFZMessage")
     public Result getSFZMessage(@RequestParam Map<String, String> params) {
-        return Result.successJson(new LinkedHashMap<String, Object>());
+        Map<String, Object> data = new LinkedHashMap<>();
+        data.put("empname", "演示顾问");
+        data.put("enumname", "居民身份证");
+        data.put("cardnum", "******************");
+        data.put("zm", "");
+        data.put("fm", "");
+        return Result.successJson(data);
     }
 
     private List<Map<String, Object>> sampleTxRows(int count) {

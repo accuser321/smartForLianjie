@@ -79,3 +79,12 @@
 - 已补齐首页统计与积分链路：
   - `getNowDayCount` 追加首页所需字段（`JRZF/JRFC/JRHK/JYZF/JYFC/JYHK/wdMsgCount`）；
   - 新增 `saas/abtComEmpnoJifen` 兼容控制器（`jfList/getJF/jfSum`）。
+
+## 14. 最新进展（2026-02-21 凌晨）
+- 按用户确认范围继续开发（1/2/3）：
+  - 咨询链路：`insertKjChat/getLS/updateMSG` 已增加兼容降级，外部依赖异常时不阻断前端流程；
+  - 用户中心资料：`getPersonalData/getZYZMessage/getSFZMessage` 已补齐前端页面依赖字段；
+  - 活动与消息推送链路沿用已补齐结构（上一轮已完成）。
+- 用户明确暂停功能（记录为白名单外）：
+  - 提现与银行卡：`upMount/upYHKMessage/selectYHByEmpno`
+  - 优惠券链路：`selectempCouponList/useFWCoupon/grantCoupon`
