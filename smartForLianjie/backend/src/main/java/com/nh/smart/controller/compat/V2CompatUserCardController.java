@@ -1,13 +1,56 @@
 package com.nh.smart.controller.compat;
 
 import com.nh.smart.entity.base.Result;
+import com.nh.smart.util.JwtTokenUtil;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @RestController
 @RequestMapping("/core/abtComUserCard")
 public class V2CompatUserCardController {
+
+    private static final Map<String, Map<String, Object>> PERSONAL_STORE = new ConcurrentHashMap<>();
+
+    private String safeEmpno() {
+        try {
+            String empno = JwtTokenUtil.getEmpno();
+            return (empno == null || empno.trim().isEmpty()) ? "E10001" : empno;
+        } catch (Exception e) {
+            return "E10001";
+        }
+    }
+
+    private String safeComid() {
+        try {
+            String comid = JwtTokenUtil.getComid();
+            return (comid == null || comid.trim().isEmpty()) ? "COMPAT" : comid;
+        } catch (Exception e) {
+            return "COMPAT";
+        }
+    }
+
+    private Map<String, Object> defaultPersonal(String empno) {
+        Map<String, Object> data = new LinkedHashMap<>();
+        data.put("comname", "演示机构");
+        data.put("empname", "演示顾问");
+        data.put("phone", "13800000000");
+        data.put("sex", "1");
+        data.put("email", "");
+        data.put("zaddr", "");
+        data.put("degreename", "");
+        data.put("wxnumber", "");
+        data.put("pdesc", "");
+        data.put("remark", "");
+        data.put("empno", empno);
+        data.put("comid", safeComid());
+        return data;
+    }
+
+    private Map<String, Object> getOrCreatePersonal(String empno) {
+        return PERSONAL_STORE.computeIfAbsent(empno, this::defaultPersonal);
+    }
 
     @GetMapping("/selectKHbyEmpno")
     public Result selectKHbyEmpno(@RequestParam Map<String, String> params) {
@@ -22,10 +65,12 @@ public class V2CompatUserCardController {
 
     @GetMapping("/getEmpnoPersonal")
     public Result getEmpnoPersonal(@RequestParam Map<String, String> params) {
+        String empno = params.getOrDefault("empno", safeEmpno());
+        Map<String, Object> profile = getOrCreatePersonal(empno);
         Map<String, Object> data = new LinkedHashMap<>();
-        data.put("empno", params.getOrDefault("empno", ""));
-        data.put("empname", "演示顾问");
-        data.put("phone", "13800000000");
+        data.put("empno", empno);
+        data.put("empname", profile.getOrDefault("empname", "演示顾问"));
+        data.put("phone", profile.getOrDefault("phone", "13800000000"));
         data.put("headimg", "");
         data.put("zyzstatus", "0");
         data.put("sfzstatus", "1");
@@ -49,18 +94,8 @@ public class V2CompatUserCardController {
 
     @GetMapping("/getPersonalData")
     public Result getPersonalData(@RequestParam Map<String, String> params) {
-        Map<String, Object> data = new LinkedHashMap<>();
-        data.put("comname", "演示机构");
-        data.put("empname", "演示顾问");
-        data.put("phone", "13800000000");
-        data.put("sex", "1");
-        data.put("email", "");
-        data.put("zaddr", "");
-        data.put("degreename", "");
-        data.put("wxnumber", "");
-        data.put("pdesc", "");
-        data.put("remark", "");
-        return Result.successJson(data);
+        String empno = params.getOrDefault("empno", safeEmpno());
+        return Result.successJson(new LinkedHashMap<>(getOrCreatePersonal(empno)));
     }
 
     @PutMapping("/upMount")
@@ -97,6 +132,15 @@ public class V2CompatUserCardController {
 
     @PutMapping("/updatePersonalData")
     public Result updatePersonalData(@RequestBody Map<String, Object> data) {
+        String empno = String.valueOf(data.getOrDefault("empno", safeEmpno()));
+        Map<String, Object> stored = getOrCreatePersonal(empno);
+        for (Map.Entry<String, Object> e : data.entrySet()) {
+            if (e.getValue() != null) {
+                stored.put(e.getKey(), e.getValue());
+            }
+        }
+        stored.put("empno", empno);
+        PERSONAL_STORE.put(empno, stored);
         return Result.successJson();
     }
 

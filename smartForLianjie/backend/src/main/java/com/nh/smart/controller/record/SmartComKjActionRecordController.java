@@ -22,7 +22,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 /**
@@ -36,6 +39,7 @@ public class SmartComKjActionRecordController {
 
     @Autowired
     private SmartComKjActionRecordService smartComKjActionRecordService;
+    private static final Map<String, List<Map<String, Object>>> COMPAT_CHAT_HISTORY = new ConcurrentHashMap<>();
 
     /**
      * 添加行为记录
@@ -230,9 +234,18 @@ public class SmartComKjActionRecordController {
       }
       return Result.successJson(resultMap);
     } catch (Exception e) {
-      // 兼容模式下，外部 IM 历史不可用时返回空结构避免前端报错
+      // 兼容模式下，外部 IM 历史不可用时返回会话模拟历史，保证前端联调
+      String sender = "";
+      String receiver = "";
+      try {
+        JSONObject req = JSONObject.parseObject(data == null ? "{}" : data);
+        sender = req.getString("sender");
+        receiver = req.getString("receiver");
+      } catch (Exception ignore) {
+      }
+      List<Map<String, Object>> compatResult = findCompatHistory(sender, receiver);
       resultMap.put("time", String.valueOf(System.currentTimeMillis()));
-      resultMap.put("result", new ArrayList<>());
+      resultMap.put("result", compatResult);
       return Result.successJson(resultMap);
     }
   }
@@ -264,6 +277,7 @@ public class SmartComKjActionRecordController {
       return Result.errorJson("参数有误！");
     }
     // 业务处理：若外部依赖或库未就绪，兼容返回成功避免前端链路阻断
+    appendCompatChat(empno, khuserid, content, type, date);
     try {
       String serverName = IpUtil.getServerName(request);
       Integer integer = smartComKjActionRecordService.insertKjChat(empno, khuserid, content, type, date, read, rytype, serverName);
@@ -274,6 +288,49 @@ public class SmartComKjActionRecordController {
     } catch (Exception e) {
       return Result.successJson();
     }
+  }
+
+  private void appendCompatChat(String empno, String khuserid, String content, String type, String date) {
+    String key = buildChatKey(empno, khuserid);
+    List<Map<String, Object>> list = COMPAT_CHAT_HISTORY.computeIfAbsent(key, k -> new CopyOnWriteArrayList<>());
+    String now = formatNowDateTime();
+    String msgDateCreated = now + "." + String.format(Locale.ROOT, "%03d", System.currentTimeMillis() % 1000);
+    Map<String, Object> item = new HashMap<>();
+    item.put("msgReceiver", "1".equals(type) ? khuserid : empno);
+    item.put("msgId", UUID.randomUUID().toString().replace("-", ""));
+    item.put("msgDateCreated", msgDateCreated);
+    item.put("msgContent", content);
+    item.put("msgType", 1);
+    item.put("msgSender", "1".equals(type) ? empno : khuserid);
+    list.add(item);
+  }
+
+  private List<Map<String, Object>> findCompatHistory(String sender, String receiver) {
+    List<Map<String, Object>> all = new ArrayList<>();
+    for (Map.Entry<String, List<Map<String, Object>>> e : COMPAT_CHAT_HISTORY.entrySet()) {
+      String key = e.getKey();
+      if (sender != null && !sender.isEmpty() && receiver != null && !receiver.isEmpty()) {
+        if (!(key.contains(sender) || key.contains(receiver))) {
+          continue;
+        }
+      }
+      all.addAll(e.getValue());
+    }
+    all.sort(Comparator.comparing(o -> String.valueOf(o.getOrDefault("msgDateCreated", ""))));
+    if (all.size() <= 50) {
+      return all;
+    }
+    return new ArrayList<>(all.subList(all.size() - 50, all.size()));
+  }
+
+  private String buildChatKey(String empno, String khuserid) {
+    String a = empno == null ? "" : empno.trim();
+    String b = khuserid == null ? "" : khuserid.trim();
+    return a + "|" + b;
+  }
+
+  private String formatNowDateTime() {
+    return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
   }
 
 

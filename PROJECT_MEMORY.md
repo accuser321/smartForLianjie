@@ -95,3 +95,9 @@
   - `getActivity`：按 `activityno` 返回不同活动详情；
   - `getKHContacts`：补充客户关系图结构数据（`message/relationship`）；
   - `selectKFMsgList`：补充 `userid` 字段并扩展示例消息。
+
+## 16. 最新进展（2026-02-21 凌晨 3）
+- 再按用户确认“1,2,3都要”完成：
+  - 个人资料：`updatePersonalData` 已支持保存后回显一致（内存态）；
+  - 咨询消息：`insertKjChat/getLS` 已形成会话级模拟历史闭环；
+  - 首页角标：`selectPush/selectKFMsgList/selectWDKFMsg` 已形成读未读联动。
